@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a node in the linked list
+struct Node {
+    int key;
+    int value;
+    struct Node* next;
+};
+
+// Define a structure for the hash table
+struct HashTable {
+    int size;
+    struct Node** table;
+};
+
+// Function to create a new node
+struct Node* createNode(int key, int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a new hash table
+struct HashTable* createHashTable(int size) {
+    struct HashTable* hashTable = (struct HashTable*)malloc(sizeof(struct HashTable));
+    hashTable->size = size;
+    
+    // Allocate memory for the array of linked lists
+    hashTable->table = (struct Node**)malloc(sizeof(struct Node*) * size);
+    
+    // Initialize each linked list to NULL
+    for (int i = 0; i < size; i++) {
+        hashTable->table[i] = NULL;
+    }
+    
+    return hashTable;
+}
+
+// Hash function to determine the index in the hash table
+int hashFunction(int key, int size) {
+    return key % size;
+}
+
+// Function to insert a key-value pair into the hash table
+void insert(struct HashTable* hashTable, int key, int value) {
+    // Calculate the index using the hash function
+    int index = hashFunction(key, hashTable->size);
+    
+    // Create a new node with the key-value pair
+    struct Node* newNode = createNode(key, value);
+    
+    // Insert the node into the linked list at the calculated index
+    newNode->next = hashTable->table[index];
+    hashTable->table[index] = newNode;
+}
+
+// Function to search for a key in the hash table and return its value
+int search(struct HashTable* hashTable, int key) {
+    // Calculate the index using the hash function
+    int index = hashFunction(key, hashTable->size);
+    
+    // Search for the key in the linked list at the calculated index
+    struct Node* current = hashTable->table[index];
+    while (current != NULL) {
+        if (current->key == key) {
+            return current->value;
+        }
+        current = current->next;
+    }
+    
+    // Key not found
+    printf("Key not found\n");
+    return -1;
+}
+
+// Function to display the contents of the hash table
+void displayHashTable(struct HashTable* hashTable) {
+    for (int i = 0; i < hashTable->size; i++) {
+        printf("Bucket %d: ", i);
+        struct Node* current = hashTable->table[i];
+        while (current != NULL) {
+            printf("(%d, %d) ", current->key, current->value);
+            current = current->next;
+        }
+        printf("\n");
+    }
+}
+
+// Driver program
+int main() {
+    struct HashTable* hashTable = createHashTable(10);
+
+    // Insert key-value pairs
+    insert(hashTable, 1, 10);
+    insert(hashTable, 2, 20);
+    insert(hashTable, 3, 30);
+    insert(hashTable, 11, 110);
+    insert(hashTable, 12, 120);
+
+    // Display the contents of the hash table
+    displayHashTable(hashTable);
+
+    // Search for a key
+    int keyToSearch = 2;
+    printf("Value for key %d: %d\n", keyToSearch, search(hashTable, keyToSearch));
+
+    // Free memory
+    for (int i = 0; i < hashTable->size; i++) {
+        struct Node* current = hashTable->table[i];
+        while (current != NULL) {
+            struct Node* next = current->next;
+            free(current);
+            current = next;
+        }
+    }
+    free(hashTable->table);
+    free(hashTable);
+
+    return 0;
+}

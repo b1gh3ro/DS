@@ -1,0 +1,93 @@
+#include<stdio.h>
+#include<stdlib.h>
+#define N 5
+int queue[N];
+int front=-1,rear=-1;
+void Enqueue(int x);
+void Dequeue();
+void Peek();
+void Display();
+int main(){
+int choice;
+long x;
+while(1){
+printf("The operations can be performed on circular queue are:\n");
+printf("1.Enqueue\n2.Dequeue\n3.peek\n4.display\n5.End\n");
+printf("Enter the choice: ");
+scanf("%d",&choice);
+switch(choice){
+case 1:
+printf("Enter the element to be inserted: ");
+scanf("%d",&x);
+Enqueue(x);
+break;
+case 2:
+Dequeue();
+break;
+
+case 3:
+Peek();
+break;
+case 4:
+Display();
+break;
+case 5:
+printf(“The program has been ended\n”);
+exit(0);
+default: printf("Enter a valid choice!\n");
+}
+}
+}
+void Enqueue(int x){
+if(front==-1 && rear==-1){
+front=rear=0;
+queue[rear]=x;
+}
+else if((rear+1)%N==front){
+printf("Queue is full\n");
+}
+else{
+rear=(rear+1)%N;
+queue[rear]=x;
+}
+}
+
+void Dequeue(){
+if(front==-1 && rear==-1){
+printf("Underflow!");
+}
+else if(front==rear){
+printf("The dequeued element is %d",queue[front]);
+front=rear=-1;
+}
+else{
+printf("The deleted element is %d\n",queue[front]);
+front=(front+1)%N;
+}
+}
+void Peek()
+{
+if(front==-1 && rear==-1)
+{
+printf("Queue is empty\n");
+}
+else
+{
+printf("The element peeked is %d\n",queue[front]);
+}
+}
+void Display()
+{
+int i=front;
+
+if(front==-1 && rear==-1){
+printf("Underflow!");
+}
+else{
+while(i!=rear){
+printf("%d\n",queue[i]);
+i=(i+1)%N;
+}
+printf("%d\n",queue[rear]);
+}
+}

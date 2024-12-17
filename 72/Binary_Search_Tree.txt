@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+int key;
+struct Node* left;
+struct Node* right;
+};
+struct Node* createNode(int key) {
+struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+newNode->key = key;
+newNode->left = newNode->right = NULL;
+return newNode;
+}
+struct Node* insert(struct Node* root, int key) {
+if (root == NULL)
+return createNode(key);
+if (key < root->key)
+root->left = insert(root->left, key);
+else if (key > root->key)
+root->right = insert(root->right, key);
+return root;
+100
+}
+
+struct Node* findMin(struct Node* root) {
+while (root->left != NULL)
+root = root->left;
+return root;
+}
+struct Node* findMax(struct Node* root) {
+while (root->right != NULL)
+root = root->right;
+return root;
+}
+struct Node* search(struct Node* root, int key) {
+if (root == NULL || root->key == key)
+return root;
+if (key < root->key)
+return search(root->left, key);
+else
+return search(root->right, key);
+}
+struct Node* deleteNode(struct Node* root, int key) {
+if (root == NULL)
+101
+return root;
+if (key < root->key)
+root->left = deleteNode(root->left, key);
+else if (key > root->key)
+root->right = deleteNode(root->right, key);
+else {
+
+if (root->left == NULL) {
+struct Node* temp = root->right;
+free(root);
+return temp;
+} else if (root->right == NULL) {
+struct Node* temp = root->left;
+free(root);
+return temp;
+}
+struct Node* temp = findMin(root->right);
+root->key = temp->key;
+
+root->right = deleteNode(root->right, temp->key);
+}
+return root;
+}
+void inorderTraversal(struct Node* root) {
+if (root != NULL) {
+inorderTraversal(root->left);
+printf("%d ", root->key);
+inorderTraversal(root->right);
+}
+}
+int main() {
+struct Node* root = NULL;
+root = insert(root, 50);
+insert(root, 30);
+insert(root, 20);
+insert(root, 40);
+insert(root, 70);
+insert(root, 60);
+insert(root, 80);
+printf("Inorder traversal of BST: ");
+inorderTraversal(root);
+printf("\n");
+printf("Minimum key in BST: %d\n", findMin(root)->key);
+printf("Maximum key in BST: %d\n", findMax(root)->key);
+int searchKey = 40;
+struct Node* searchResult = search(root, searchKey);
+if (searchResult != NULL)
+printf("Key %d found in BST.\n", searchKey);
+else
+printf("Key %d not found in BST.\n", searchKey);
+int deleteKey = 30;
+root = deleteNode(root, deleteKey);
+printf("Inorder traversal after deleting node with key %d: ", deleteKey);
+inorderTraversal(root);
+printf("\n");
+return 0;
+}

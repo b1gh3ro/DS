@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct HashTable {
+int size;
+int *keys;
+int *values;
+};
+struct HashTable* createHashTable(int size) {
+struct HashTable* hashTable = (struct HashTable*)malloc(sizeof(struct
+HashTable));
+if (hashTable != NULL) {
+hashTable->size = size;
+hashTable->keys = (int*)malloc(sizeof(int) * size);
+hashTable->values = (int*)malloc(sizeof(int) * size);
+for (int i = 0; i < size; i++) {
+hashTable->keys[i] = -1;
+}
+}
+return hashTable;
+}
+
+int hashFunction(struct HashTable* hashTable, int key) {
+return key % hashTable->size;
+}
+void insert(struct HashTable* hashTable, int key, int value) {
+int index = hashFunction(hashTable, key);
+
+while (hashTable->keys[index] != -1) {
+index = (index + 1) % hashTable->size;
+}
+
+hashTable->keys[index] = key;
+hashTable->values[index] = value;
+}
+
+int search(struct HashTable* hashTable, int key) {
+int index = hashFunction(hashTable, key);
+
+while (hashTable->keys[index] != -1) {
+if (hashTable->keys[index] == key) {
+return hashTable->values[index];
+}
+index = (index + 1) % hashTable->size;
+}
+return -1;
+}
+// Function to display the hash table
+void displayHashTable(struct HashTable* hashTable) {
+printf("Hash Table:\n");
+for (int i = 0; i < hashTable->size; i++) {
+printf("Bucket [%d] -> ", i);
+if (hashTable->keys[i] != -1) {
+printf("(%d, %d)", hashTable->keys[i], hashTable->values[i]);
+}
+printf("\n");
+}
+}
+int main() {
+struct HashTable* hashTable = createHashTable(5);
+insert(hashTable, 12, 120);
+insert(hashTable, 22, 220);
+insert(hashTable, 7, 70);
+insert(hashTable, 42, 420);
+insert(hashTable, 32, 320);
+displayHashTable(hashTable);
+int searchResult = search(hashTable, 7);
+if (searchResult != -1) {
+printf("Value for key 7: %d\n", searchResult);
+}
+ else 
+{
+printf("Key 7 not found in the hash table\n");
+}
+free(hashTable->keys);
+free(hashTable->values);
+free(hashTable);
+return 0;
+}

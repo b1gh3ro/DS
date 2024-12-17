@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_SIZE 100
+struct Deque {
+int arr[MAX_SIZE];
+int front, rear;
+};
+
+void initializeDeque(struct -Deque *deque) {
+deque->front = -1;
+deque->rear = -1;
+}
+
+int isEmpty(struct Deque *deque) {
+return (deque->front == -1 && deque->rear == -1);
+}
+
+int isFull(struct Deque *deque) {
+return (deque->rear + 1) % MAX_SIZE == deque->front;
+}
+
+void insertFront(struct Deque *deque, int data) {
+if (isFull(deque)) {
+printf("Deque is full. Cannot insert at front.\n");
+return;
+}
+if (isEmpty(deque)) {
+deque->front = 0;
+deque->rear = 0;
+} else {
+deque->front = (deque->front - 1 + MAX_SIZE) % MAX_SIZE;
+}
+deque->arr[deque->front] = data;
+printf("Inserted %d at the front of the deque.\n", data);
+}
+
+void insertRear(struct Deque *deque, int data) {
+if (isFull(deque)) {
+printf("Deque is full. Cannot insert at rear.\n");
+return;
+}
+if (isEmpty(deque)) {
+deque->front = 0;
+deque->rear = 0;
+} else {
+deque->rear = (deque->rear + 1) % MAX_SIZE;
+}
+
+deque->arr[deque->rear] = data;
+printf("Inserted %d at the rear of the deque.\n", data);
+}
+
+void deleteFront(struct Deque *deque) {
+if (isEmpty(deque)) {
+printf("Deque is empty. Cannot delete from front.\n");
+return;
+}
+if (deque->front == deque->rear) {
+// Last element in the deque
+printf("Deleted %d from the front of the deque.\n", deque->arr[deque->front]);
+deque->front = -1;
+deque->rear = -1;
+} 
+else
+ {
+printf("Deleted %d from the front of the deque.\n", deque->arr[deque->front]);
+deque->front = (deque->front + 1) % MAX_SIZE;
+}
+}
+
+void deleteRear(struct Deque *deque) {
+if (isEmpty(deque)) {
+printf("Deque is empty. Cannot delete from rear.\n");
+return;
+}
+if (deque->front == deque->rear) {
+printf("Deleted %d from the rear of the deque.\n", deque->arr[deque->rear]);
+deque->front = -1;
+deque->rear = -1;
+} 
+else
+ {
+
+printf("Deleted %d from the rear of the deque.\n", deque->arr[deque->rear]);
+
+deque->rear = (deque->rear - 1 + MAX_SIZE) % MAX_SIZE;
+}
+}
+void displayDeque(struct Deque *deque) {
+if (isEmpty(deque)) {
+printf("Deque is empty.\n");
+return;
+}
+printf("Deque elements: ");
+int i = deque->front;
+while (1)
+ {
+printf("%d ", deque->arr[i]);
+if (i == deque->rear)
+ break;
+i = (i + 1) % MAX_SIZE;
+}
+printf("\n");
+}
+int main() {
+struct Deque deque;
+
+initializeDeque(&deque);
+insertFront(&deque, 10);
+insertRear(&deque, 20);
+insertFront(&deque, 5);
+displayDeque(&deque);
+deleteFront(&deque);
+displayDeque(&deque);
+deleteRear(&deque);
+displayDeque(&deque);
+return 0;
+}

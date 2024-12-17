@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10
+
+// Define a structure for the hash table
+struct HashTable {
+    int size;
+    int *keys;
+    int *values;
+};
+
+// Function to create a new hash table
+struct HashTable* createHashTable() {
+    struct HashTable* hashTable = (struct HashTable*)malloc(sizeof(struct HashTable));
+    hashTable->size = TABLE_SIZE;
+    
+    // Allocate memory for the arrays
+    hashTable->keys = (int*)malloc(sizeof(int) * TABLE_SIZE);
+    hashTable->values = (int*)malloc(sizeof(int) * TABLE_SIZE);
+    
+    // Initialize keys to -1 (indicating an empty slot)
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable->keys[i] = -1;
+    }
+    
+    return hashTable;
+}
+
+// Hash function to determine the index in the hash table
+int hashFunction(int key, int size) {
+    return key % size;
+}
+
+// Function to insert a key-value pair into the hash table using linear probing
+void insert(struct HashTable* hashTable, int key, int value) {
+    int index = hashFunction(key, hashTable->size);
+
+    // Linear probing until an empty slot is found
+    while (hashTable->keys[index] != -1) {
+        index = (index + 1) % hashTable->size;
+    }
+
+    // Insert the key and value into the found slot
+    hashTable->keys[index] = key;
+    hashTable->values[index] = value;
+}
+
+// Function to search for a key in the hash table and return its value
+int search(struct HashTable* hashTable, int key) {
+    int index = hashFunction(key, hashTable->size);
+
+    // Linear probing until the key is found or an empty slot is encountered
+    while (hashTable->keys[index] != -1) {
+        if (hashTable->keys[index] == key) {
+            return hashTable->values[index];
+        }
+        index = (index + 1) % hashTable->size;
+    }
+
+    // Key not found
+    printf("Key not found\n");
+    return -1;
+}
+
+// Function to display the contents of the hash table
+void displayHashTable(struct HashTable* hashTable) {
+    for (int i = 0; i < hashTable->size; i++) {
+        if (hashTable->keys[i] != -1) {
+            printf("Index %d: (Key: %d, Value: %d)\n", i, hashTable->keys[i], hashTable->values[i]);
+        } else {
+            printf("Index %d: Empty\n", i);
+        }
+    }
+}
+
+// Driver program
+int main() {
+    struct HashTable* hashTable = createHashTable();
+
+    // Insert key-value pairs
+    insert(hashTable, 1, 10);
+    insert(hashTable, 2, 20);
+    insert(hashTable, 3, 30);
+    insert(hashTable, 11, 110);
+    insert(hashTable, 12, 120);
+
+    // Display the contents of the hash table
+    displayHashTable(hashTable);
+
+    // Search for a key
+    int keyToSearch = 2;
+    printf("Value for key %d: %d\n", keyToSearch, search(hashTable, keyToSearch));
+
+    // Free memory
+    free(hashTable->keys);
+    free(hashTable->values);
+    free(hashTable);
+
+    return 0;
+}

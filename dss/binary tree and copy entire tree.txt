@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+struct Node* copyTree(struct Node* original) {
+    if (original == NULL) {
+        return NULL;
+    }
+
+    struct Node* newNode = createNode(original->data);
+    newNode->left = copyTree(original->left);
+    newNode->right = copyTree(original->right);
+
+    return newNode;
+}
+
+void inorderTraversal(struct Node* root) {
+    if (root != NULL) {
+        inorderTraversal(root->left);
+        printf("%d ", root->data);
+        inorderTraversal(root->right);
+    }
+}
+
+int main() {
+    // Creating the original binary tree
+    struct Node* originalRoot = createNode(1);
+    originalRoot->left = createNode(2);
+    originalRoot->right = createNode(3);
+    originalRoot->left->left = createNode(4);
+    originalRoot->left->right = createNode(5);
+    originalRoot->right->left = createNode(6);
+    originalRoot->right->right = createNode(7);
+
+    // Copying the entire binary tree
+    struct Node* copiedRoot = copyTree(originalRoot);
+
+    // Printing the inorder traversal of the original and copied trees
+    printf("Original Tree Inorder Traversal: ");
+    inorderTraversal(originalRoot);
+    printf("\n");
+
+    printf("Copied Tree Inorder Traversal: ");
+    inorderTraversal(copiedRoot);
+    printf("\n");
+
+    return 0;
+}

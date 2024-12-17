@@ -1,0 +1,201 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct Node{
+int data;
+struct Node *prev;
+struct Node *next;
+};
+struct Node *head;
+struct Node *tail;
+void CreateDLL(int i){
+struct Node *newNode=(struct Node *)malloc(sizeof(struct Node));
+printf("Enter the data to be inserted in node %d: ",i);
+scanf("%d",&(newNode->data));
+newNode->next=NULL;
+newNode->prev=NULL;
+if(head==NULL){
+head=newNode;
+tail=newNode;
+}
+else{
+tail->next=newNode;
+newNode->prev=tail;
+tail=newNode;
+}
+}
+14
+struct Node * DllTraversal(struct Node *head){
+struct Node *ptr=head;
+while(ptr!=NULL){
+printf("Element:%d \n",ptr->data);
+ptr=ptr->next;
+}
+}
+struct Node * InsertAtBeg(struct Node *head){
+struct Node *newNode=(struct Node*)malloc(sizeof(struct Node));
+printf("Enter the data in the Node: ");
+scanf("%d",&newNode->data);
+newNode->prev=NULL;
+head->prev=newNode;
+newNode->next=head;
+head=newNode;
+return head;
+}
+struct Node * InsertAtEnd(struct Node *tail){
+struct Node *newNode=(struct Node*)malloc(sizeof(struct Node));
+newNode->prev=NULL;
+newNode->next=NULL;
+printf("Enter the data in the Node: ");
+scanf("%d",&(newNode->data));
+tail->next=newNode;
+15
+newNode->prev=tail;
+tail=newNode;
+return tail;
+}
+struct Node * InsertAtIndex(struct Node *head){
+int index;
+printf("Enter the index at which the node is to be inserted: ");
+scanf("%d",&index);
+if(index==0){
+InsertAtBeg(head);
+}
+else{
+struct Node *newNode=(struct Node *)malloc(sizeof(struct Node));
+struct Node *p=head;
+newNode->prev=NULL;
+newNode->next=NULL;
+printf("Enter the data in the Node: ");
+scanf("%d",&(newNode->data));
+for(int i=0;i<(index-1);i++){
+p=p->next;
+}
+newNode->prev=p;
+newNode->next=p->next;
+p->next=newNode;
+newNode->next->prev=newNode;
+}
+16
+return head;
+}
+struct Node * DeleteAtBeg(struct Node *head){
+struct Node *ptr;
+ptr=head;
+if(head==NULL){
+printf("Linked list is empty\n");
+}
+else{
+head=head->next;
+head->prev=NULL;
+}
+free(ptr);
+return head;
+}
+struct Node * DeleteAtEnd(struct Node *tail){
+struct Node *ptr;
+ptr=tail;
+tail=tail->prev;
+tail->next=NULL;
+free(ptr);
+return tail;
+}
+struct Node * DeleteAtIndex(struct Node *head){
+struct Node *ptr=head;
+int i=1,index;
+printf("Enter the index at which the node is to be inserted:");
+17
+scanf("%d",&index);
+while(i<index){
+ptr=ptr->next;
+i++;
+}
+ptr->prev->next=ptr->next;
+ptr->next->prev=ptr->prev;
+free(ptr);
+return head;
+}
+struct Node * DLLReversal(){
+struct Node *Current,*nextNode=NULL;
+Current=head;
+while(Current!=NULL){
+nextNode=Current->next;
+Current->next=Current->prev;
+Current->prev=nextNode;
+Current=nextNode;
+}
+Current=head;
+head=tail;
+tail=Current;
+}
+int main(){
+int n,choice;
+printf("Enter the no.of nodes of linked list: ");
+18
+scanf("%d",&n);
+for(int i=0;i<n;i++){
+CreateDLL(i);
+}
+printf("The linked list:\n");
+DllTraversal(head);
+while(1){
+printf("Operations on Doubly linked list are: \n1.Insert at begining.\n");
+printf("2.Insert at index.\n");
+printf("3.Insert at end.\n");
+printf("4.Delete at first\n");
+printf("5.Delete at index\n");
+printf("6.Delete at last\n");
+printf("7.End\n");
+printf("Enter the choice of operation you need in Doubly linked list: ");
+scanf("%d",&choice);
+switch(choice){
+case 1 :
+printf("Linked list before insertion:\n");
+DllTraversal(head);
+fflush(stdin);
+head=InsertAtBeg(head);
+printf("After insertion at begining:\n");
+DllTraversal(head);
+break;
+case 2 :
+19
+printf("Linked list before insertion:\n");
+DllTraversal(head);
+fflush(stdin);
+head=InsertAtIndex(head);
+printf("After insertion\n");
+DllTraversal(head);
+break;
+case 3:
+printf("Linked list before insertion:\n");
+DllTraversal(head);
+tail=InsertAtEnd(tail);
+printf(" After insertion at end: \n");
+DllTraversal(head);
+break;
+case 4:
+printf("Deleting the Node at begining\n");
+head=DeleteAtBeg(head);
+printf("Linked list after Deletion\n");
+DllTraversal(head);
+break;
+case 5:
+head=DeleteAtIndex(head);
+printf("Linked list after Deletion\n");
+DllTraversal(head);
+break;
+case 6:
+printf("Deleting the last Node\n");
+tail=DeleteAtEnd(tail);
+printf("Linked list after Deletion\n");
+20
+DllTraversal(head);
+break;
+case 7:
+printf("The program has ended\n");
+exit(0);
+default:
+printf("****** Invalid choice *******\n");
+break;
+}
+}
+}
