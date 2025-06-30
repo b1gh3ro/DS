@@ -1,0 +1,73 @@
+#include <stdio.h> 
+ 
+#define MAX_ITEMS 100 
+ 
+int n, W; 
+int weights[MAX_ITEMS], values[MAX_ITEMS]; 
+int max_value = 0; 
+int best_set[MAX_ITEMS]; 
+int current_set[MAX_ITEMS]; 
+ 
+void knapsack(int i, int current_weight, int current_value) { 
+    if (i == n) { 
+        if (current_value > max_value) { 
+            max_value = current_value; 
+            for (int j = 0; j < n; j++) { 
+                best_set[j] = current_set[j]; 
+            } 
+        } 
+        return; 
+    } 
+ 
+    current_set[i] = 0; 
+    knapsack(i + 1, current_weight, current_value); 
+     
+    if (current_weight + weights[i] <= W) { 
+        current_set[i] = 1; 
+        knapsack(i + 1, current_weight + weights[i], current_value + values[i]); 
+    } 
+} 
+ 
+int main() { 
+    printf("Enter the number of items: "); 
+    scanf("%d", &n); 
+     
+    printf("Enter the maximum capacity of the knapsack: "); 
+    scanf("%d", &W); 
+     
+    printf("Enter the weights of the items:\n"); 
+    for (int i = 0; i < n; i++) { 
+        scanf("%d", &weights[i]); 
+    } 
+     
+    printf("Enter the values of the items:\n"); 
+    for (int i = 0; i < n; i++) { 
+        scanf("%d", &values[i]); 
+    } 
+
+     
+    knapsack(0, 0, 0); 
+     
+    printf("The maximum value is: %d\n", max_value); 
+    printf("The included items are:\n"); 
+    for (int i = 0; i < n; i++) { 
+        if (best_set[i]) { 
+            printf("Item %d (Weight: %d, Value: %d)\n", i + 1, weights[i], values[i]); 
+        } 
+    } 
+     
+    return 0; 
+} 
+ 
+Output: 
+ 
+Enter the number of items: 4 
+Enter the maximum capacity of the knapsack: 5 
+Enter the weights of the items: 
+2 3 4 5 
+Enter the values of the items: 
+3 4 5 6 
+The maximum value is: 7 
+The included items are: 
+Item 1 (Weight: 2, Value: 3) 
+Item 2 (Weight: 3, Value: 4) 
