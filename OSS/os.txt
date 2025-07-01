@@ -1649,3 +1649,72 @@ At least one of the numbers is not positive.
 Neither of the numbers is zero.
 The two numbers are not equal.
 38
+
+
+1)Write a C program to create a child process using fork() and display the process IDs of both child and parent processes.
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    pid_t pid = fork();  // Create a child process
+
+    if (pid < 0) {
+        // Fork failed
+        printf("Fork failed!\n");
+        return 1;
+    } else if (pid == 0) {
+        // Child process
+        printf("Child Process:\n");
+        printf("Child PID: %d\n", getpid());
+        printf("Parent PID (from child): %d\n", getppid());
+    } else {
+        // Parent process
+        printf("Parent Process:\n");
+        printf("Parent PID: %d\n", getpid());
+        printf("Child PID (from parent): %d\n", pid);
+    }
+
+    return 0;
+}
+
+2)Write a program where the parent process waits for the child to complete using wait().
+
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        printf("Fork failed!\n");
+        return 1;
+    } else if (pid == 0) {
+        // Child process
+        printf("Child Process is running. PID = %d\n", getpid());
+        sleep(2);  // Simulate some work
+        printf("Child Process completed.\n");
+    } else {
+        // Parent process
+        wait(NULL);  // Wait for the child to finish
+        printf("Parent Process: Child completed. Parent PID = %d\n", getpid());
+    }
+
+    return 0;
+}
+
+3)Write a program to print the PID and PPID using getpid() and getppid().
+
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    printf("Current Process ID (PID): %d\n", getpid());
+    printf("Parent Process ID (PPID): %d\n", getppid());
+
+    return 0; 
+}
