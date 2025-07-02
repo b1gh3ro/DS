@@ -1,0 +1,126 @@
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <limits.h> 
+ 
+#define MAXCITIES 10 
+ 
+int numCities; 
+int graph[MAXCITIES][MAXCITIES]; 
+int visited[MAXCITIES]; 
+int minCost = INT_MAX; 
+int finalPath[MAXCITIES + 1]; 
+ 
+void copyToFinal(int currPath[], int finalPath[]) { 
+    for (int i = 0; i < numCities; i++) { 
+        finalPath[i] = currPath[i]; 
+    } 
+    finalPath[numCities] = currPath[0]; 
+} 
+ 
+int firstMin(int i) { 
+    int min = INT_MAX; 
+    for (int k = 0; k < numCities; k++) { 
+        if (graph[i][k] < min && i != k) { 
+            min = graph[i][k]; 
+        } 
+    } 
+    return min; 
+} 
+ 
+int secondMin(int i) { 
+    int first = INT_MAX, second = INT_MAX; 
+    for (int j = 0; j < numCities; j++) { 
+        if (i == j) continue; 
+        if (graph[i][j] <= first) { 
+            second = first; 
+            first = graph[i][j]; 
+        } else if (graph[i][j] <= second && graph[i][j] != first) { 
+            second = graph[i][j]; 
+        } 
+    } 
+    return second; 
+} 
+ 
+void tsp(int currBound, int currWeight, int level, int currPath[]) { 
+    if (level == numCities) { 
+ 
+ 
+        if (graph[currPath[level - 1]][currPath[0]] > 0) { 
+            int currCost = currWeight + graph[currPath[level - 1]][currPath[0]]; 
+            if (currCost < minCost) { 
+                copyToFinal(currPath, finalPath); 
+                minCost = currCost; 
+            } 
+        } 
+        return; 
+    } 
+     
+    for (int i = 0; i < numCities; i++) { 
+        if (graph[currPath[level - 1]][i] > 0 && visited[i] == 0) { 
+            int temp = currBound; 
+            currWeight += graph[currPath[level - 1]][i]; 
+             
+            if (level == 1) { 
+                currBound -= ((firstMin(currPath[level - 1]) + firstMin(i)) / 2); 
+            } else { 
+                currBound -= ((secondMin(currPath[level - 1]) + firstMin(i)) / 2); 
+            } 
+             
+            if (currBound + currWeight < minCost) { 
+                currPath[level] = i; 
+                visited[i] = 1; 
+                tsp(currBound, currWeight, level + 1, currPath); 
+            } 
+             
+            currWeight -= graph[currPath[level - 1]][i]; 
+            currBound = temp; 
+             
+            for (int j = 0; j < numCities; j++) { 
+                visited[j] = 0; 
+            } 
+            for (int j = 0; j <= level - 1; j++) { 
+                visited[currPath[j]] = 1; 
+            } 
+        } 
+    } 
+} 
+ 
+void printPath(int path[]) { 
+    printf("Path taken: "); 
+    for (int i = 0; i <= numCities; i++) { 
+        printf("%d ", path[i] + 1);  
+    } 
+    printf("\n"); 
+} 
+ 
+ 
+ 
+int main() { 
+    printf("Enter the number of cities: "); 
+    scanf("%d", &numCities); 
+     
+    printf("Enter the cost matrix (enter 0 for same city and INT_MAX for unreachable):\n"); 
+    for (int i = 0; i < numCities; i++) { 
+        for (int j = 0; j < numCities; j++) { 
+            scanf("%d", &graph[i][j]); 
+        } 
+    } 
+     
+    int currPath[MAXCITIES + 1]; 
+    int currBound = 0; 
+    for (int i = 0; i < numCities; i++) { 
+        currPath[i] = -1; 
+        visited[i] = 0; 
+        currBound += (firstMin(i) + secondMin(i)); 
+    } 
+     
+    currBound = (currBound % 2 == 0) ? currBound / 2 + 1 : currBound / 2; 
+    visited[0] = 1; 
+    currPath[0] = 0; 
+    tsp(currBound, 0, 1, currPath); 
+     
+    printf("Minimum cost of traversal is: %d\n", minCost); 
+    printPath(finalPath); 
+     
+    return 0; 
+}
