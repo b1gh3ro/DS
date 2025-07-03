@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int state[5];
+int phil[5] = {0, 1, 2, 3, 4};
+int mutex = 1;
+
+int wait(int s) {
+    return --s;
+}
+
+int signal(int s) {
+    return ++s;
+}
+
+void test(int i) {
+    if (state[(i + 4) % 5] != 1 && state[i] == 0 && state[(i + 1) % 5] != 1) {
+        state[i] = 1;
+        printf("Philosopher %d is eating\n", i + 1);
+    } else {
+        printf("Philosopher %d cannot eat right now\n", i + 1);
+    }
+}
+
+void pickup(int i) {
+    mutex = wait(mutex);
+    printf("Philosopher %d tries to pick up forks\n", i + 1);
+    test(i);
+    mutex = signal(mutex);
+}
+
+void putdown(int i) {
+    mutex = wait(mutex);
+    state[i] = 0;
+    printf("Philosopher %d put down forks and is thinking\n", i + 1);
+    mutex = signal(mutex);
+}
+
+int main() {
+    int choice, i;
+    while (1) {
+        printf("\n1. Pickup Forks\n2. Putdown Forks\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                printf("Enter philosopher number (1-5): ");
+                scanf("%d", &i);
+                pickup(i - 1);
+                break;
+            case 2:
+                printf("Enter philosopher number (1-5): ");
+                scanf("%d", &i);
+                putdown(i - 1);
+                break;
+            case 3:
+                exit(0);
+        }
+    }
+    return 0;
+}
