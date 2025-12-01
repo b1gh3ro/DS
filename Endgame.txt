@@ -74,10 +74,81 @@ except nx.NetworkXNoPath:
 
 2. AO* Algorithm
 
-If u have gotten AO* as your question, then all the best...
-Since no code was correct for it...
-All the best, But do keep in mind that you are sooooo fucked...
-So, just change the question if u get it.
+import networkx as nx
+
+# Create directed AND-OR graph
+G = nx.DiGraph()
+
+G.add_edge("A", "B", type="OR")
+G.add_edge("A", "C", type="OR")
+
+G.add_edge("B", "D", type="AND")
+G.add_edge("B", "E", type="AND")
+
+G.add_edge("C", "F", type="OR")
+G.add_edge("C", "G", type="OR")
+
+# Heuristic values
+h = {
+    "A": 4, "B": 2, "C": 3,
+    "D": 1, "E": 1, "F": 4, "G": 2
+}
+
+solution_graph = {} # Solution graph marking
+
+def get_children(node):
+    children = {"AND": [], "OR": []}
+    
+    for child in G.neighbors(node):
+        edge_type = G.edges[node, child]["type"]
+        children[edge_type].append(child)
+        
+    return children
+
+def ao_star(node):
+    children = get_children(node)
+    
+    # Leaf node
+    if not children["AND"] and not children["OR"]:
+        return h[node]
+
+    # AND node
+    if children["AND"] and not children["OR"]:
+        total = 0
+        for child in children["AND"]:
+            total += ao_star(child)
+        h[node] = total
+        solution_graph[node] = children["AND"]
+        return h[node]
+
+    # OR node
+    if children["OR"] and not children["AND"]:
+        best_cost = float("inf")
+        best_child = None
+        
+        for child in children["OR"]:
+            cost = ao_star(child)
+            if cost < best_cost:
+                best_cost = cost
+                best_child = child
+        
+        h[node] = best_cost
+        solution_graph[node] = [best_child]
+        return h[node]
+
+# Main execution
+start = "A"
+final_cost = ao_star(start)
+
+print("Final AO* Cost at A:", final_cost)
+
+print("\nUpdated Heuristics:")
+for k, v in h.items():
+    print(k, ":", v)
+
+print("\nSolution Graph (Optimal Path):")
+for k, v in solution_graph.items():
+    print(k, "->", v)
 
 
 
@@ -85,21 +156,7 @@ So, just change the question if u get it.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3. CEA (input file: Training data.csv)
+3. CEA Candidate-Elimination (input file: Training data.csv)
 
 import pandas as pd
 
@@ -223,7 +280,7 @@ print(f"Prediction ({target_column}): {prediction}")
 
 
 
-5. ANN
+5. ANN neural network
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -440,7 +497,7 @@ except Exception as e:
 
 
 
-8. KNN (input file: newfeatures.csv)
+8. KNN K Nearest Neighbour (input file: newfeatures.csv)
 
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
