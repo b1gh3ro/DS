@@ -1,0 +1,717 @@
+1. A* Algorithm
+
+import networkx as nx
+
+G = nx.Graph()
+
+print("Enter edges (from to weight), 'done' to finish:")
+while True:
+    edge = input()
+    if edge.lower() == 'done': break
+    src, dst, weight = edge.split()
+    G.add_edge(src, dst, weight=int(weight))
+
+print("\nEnter heuristic values for each node to the goal")
+heuristic_values = {}
+for node in G.nodes():
+    h_value = float(input(f"Enter heuristic value for node {node}: "))
+    heuristic_values[node] = h_value
+
+start = input("\nStart node: ")
+end = input("End node: ")
+
+def calculate_path_costs(path):
+    print("\nDetailed path analysis:")
+    print("Node\tg(n)\th(n)\tf(n)")
+    print("-" * 30)
+    g_cost = 0
+
+    for i in range(len(path)):
+        node = path[i]
+        h_cost = heuristic_values[node]
+        f_cost = g_cost + h_cost
+        print(f"{node}\t{g_cost}\t{h_cost}\t{f_cost}")
+
+        if i < len(path) - 1:
+            next_node = path[i + 1]
+            g_cost += G[node][next_node]['weight']
+
+def heuristic(node1: str, node2: str) -> float:
+    return heuristic_values[node1]
+
+try:
+    path = nx.astar_path(G, start, end, heuristic=heuristic, weight='weight')
+    cost = nx.astar_path_length(G, start, end, heuristic=heuristic, weight='weight')
+    print(f"\nPath: {' -> '.join(path)}")
+    print(f"Total Cost (g): {cost}")
+    calculate_path_costs(path)
+
+except nx.NetworkXNoPath:
+    print("\nNo path found!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. AO* Algorithm
+
+If u have gotten AO* as your question, then all the best...
+Since no code was correct for it...
+All the best, But do keep in mind that you are sooooo fucked...
+So, just change the question if u get it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. CEA (input file: Training data.csv)
+
+import pandas as pd
+
+def candidate_elimination(data):
+    features = len(data.columns) - 1
+    G = [['?' for _ in range(features)]]
+    S = [['0' for _ in range(features)]]
+
+    for idx, row in data.iterrows():
+        instance = list(row.iloc[:-1])
+        label = row.iloc[-1]
+
+        if label == 'Yes':
+            if S[0][0] == '0':
+                S[0] = instance
+            else:
+                S[0] = [s if s == i else '?' for s, i in zip(S[0], instance)]
+            G = [g for g in G if all(g[i] == '?' or g[i] == instance[i]
+                                   for i in range(features))]
+        else:
+            new_G = []
+            for g in G:
+                indices = [i for i in range(features)
+                          if g[i] == '?' and instance[i] != S[0][i]]
+                for i in indices:
+                    new_g = g.copy()
+                    new_g[i] = S[0][i]
+                    if new_g not in new_G:
+                        new_G.append(new_g)
+            G = new_G if new_G else G
+
+        print(f"\nIteration {idx + 1}:")
+        print(f"S: {S}")
+        print(f"G: {G}")
+
+    return S, G
+
+def main():
+    try:
+        filename = input("Enter CSV filename: ")
+        data = pd.read_csv(filename)
+        print("\nData:\n", data)
+        S, G = candidate_elimination(data)
+        print("\nFinal Version Space:")
+        print(f"Specific: {S}")
+        print(f"General: {G}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. ID3 (input file: Training data.csv)
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.pipeline import Pipeline
+
+file_path = input("Enter the path to your CSV file: ")
+df = pd.read_csv(file_path)
+
+feature_columns = list(df.columns[:-1])
+target_column = df.columns[-1]
+
+pipeline = Pipeline([
+    ('encoder', ColumnTransformer([
+        ('ordinal', OrdinalEncoder(), feature_columns)
+    ])),
+    ('classifier', DecisionTreeClassifier(criterion='entropy'))
+])
+
+X = df[feature_columns]
+y = df[target_column]
+pipeline.fit(X, y)
+
+tree_rules = export_text(pipeline.named_steps['classifier'], feature_names=feature_columns)
+print("\nDecision Tree Rules\n", tree_rules)
+
+new_sample = pd.DataFrame([{
+    feature: input(f"Enter value for {feature}: ")
+    for feature in feature_columns
+}])
+
+prediction = pipeline.predict(new_sample)[0]
+print("\nNew Sample:", new_sample.to_dict('records')[0])
+print(f"Prediction ({target_column}): {prediction}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5. ANN
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+class SimpleNN:
+    def __init__(self, layers):
+        self.weights = [np.random.uniform(-np.sqrt(6 / (layers[i] + layers[i+1])), np.sqrt(6 / (layers[i] + layers[i+1])), (layers[i], layers[i+1])) for i in range(len(layers)-1)]
+        self.biases = [np.zeros((1, layers[i+1])) for i in range(len(layers)-1)]
+
+    def sigmoid(self, x): return 1 / (1 + np.exp(-x))
+
+    def forward(self, X):
+        self.a = [X]
+        for i in range(len(self.weights)):
+            X = self.sigmoid(np.dot(X, self.weights[i]) + self.biases[i])
+            self.a.append(X)
+        return X
+
+    def backward(self, X, y, lr):
+        m = X.shape[0]
+        delta = self.a[-1] - y
+        for i in range(len(self.weights)-1, -1, -1):
+            dW, db = np.dot(self.a[i].T, delta), np.sum(delta, axis=0, keepdims=True)
+            delta = np.dot(delta, self.weights[i].T) * self.a[i] * (1 - self.a[i])
+            self.weights[i] -= lr * dW / m
+            self.biases[i] -= lr * db / m
+
+    def train(self, X, y, epochs, lr=0.01):
+        errors, accuracies = [], []
+        for epoch in range(epochs):
+            output = self.forward(X)
+            error = mean_squared_error(y, output)
+            accuracy = np.mean(np.round(output) == y)
+            self.backward(X, y, lr)
+            errors.append(error)
+            accuracies.append(accuracy)
+            if (epoch + 1) % 1000 == 0:
+                print(f"Epoch {epoch+1}: Error {error:.4f}, Accuracy {accuracy:.2%}")
+        return errors, accuracies
+
+    def predict(self, X): return np.round(self.forward(X))
+
+    def plot(self, errors, accuracies):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        ax1.plot(errors, 'b-'); ax1.set_title('Error'); ax1.set_xlabel('Epoch'); ax1.set_ylabel('MSE')
+        ax2.plot(accuracies, 'g-'); ax2.set_title('Accuracy'); ax2.set_xlabel('Epoch'); ax2.set_ylabel('Accuracy')
+        plt.tight_layout(); plt.show()
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])
+
+nn = SimpleNN([2, 4, 1])
+errors, accuracies = nn.train(X, y, epochs=10000, lr=0.1)
+nn.plot(errors, accuracies)
+
+print("\nTesting results:")
+for i in range(len(X)):
+    pred = nn.predict(X[i:i+1])
+    print(f"{X[i]} -> {pred[0][0]} -> {y[i][0]}")
+
+print(f"\nFinal Error: {errors[-1]:.4f}, Final Accuracy: {accuracies[-1]:.2%}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6. Naive Bayes (input file: newfeatures.csv)
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, classification_report
+
+def main():
+    try:
+        filename = input("Enter the CSV filename (including extension): ")
+        data = pd.read_csv(filename)
+
+        X = data.drop('Class', axis=1)
+        y = data['Class']
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.4, random_state=42, stratify=y
+        )
+
+        model = GaussianNB()
+        model.fit(X_train, y_train)
+        predictions = model.predict(X_test)
+
+        print("\nNaive Bayes Classifier Results:")
+        print("-" * 30)
+        print(f"Accuracy: {accuracy_score(y_test, predictions):.2%}")
+        print("\nClassification Report:")
+        print(classification_report(y_test, predictions, zero_division=0))
+
+        print("\nSample Predictions:")
+        print("-" * 30)
+        for idx, (_, test_case) in enumerate(X_test.head(5).iterrows()):
+            prediction = model.predict(pd.DataFrame([test_case], columns=X.columns))[0]
+            print(f"\nCase {idx + 1}:")
+            print(f"Features: {dict(test_case)}")
+            print(f"Predicted: {prediction}")
+            print(f"Actual: {y_test.iloc[idx]}")
+
+    except FileNotFoundError:
+        print("\nError: File not found. Please check the filename and try again.")
+    except Exception as e:
+        print(f"\nAn error occurred: {str(e)}")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7. K-Means (input file: newfeatures.csv)
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+import pandas as pd
+
+file_name = input("Enter the CSV file name: ")
+
+try:
+    data = pd.read_csv(file_name)
+
+    X = data.select_dtypes(include=[np.number]).values
+
+    k = int(input("Enter the number of clusters (K): "))
+
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X)
+
+    labels = kmeans.labels_
+    centers = kmeans.cluster_centers_
+
+    print("\nCluster labels for each point:")
+    for point, label in zip(X, labels):
+        print(f"Point {point} is in Cluster {label}")
+
+    print("\nCluster Centers:")
+    for i, center in enumerate(centers):
+        print(f"Cluster {i}: Center at {center}")
+
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis', marker='o')
+    plt.scatter(centers[:, 0], centers[:, 1], c='red', marker='X', s=200, label='Centroids')
+    plt.title('K-Means Clustering (First Two Features)')
+    plt.xlabel(data.select_dtypes(include=[np.number]).columns[0])
+    plt.ylabel(data.select_dtypes(include=[np.number]).columns[1])
+    plt.legend()
+    plt.show()
+
+except FileNotFoundError:
+    print(f"Error: File '{file_name}' not found")
+except pd.errors.EmptyDataError:
+    print(f"Error: File '{file_name}' is empty")
+except Exception as e:
+    print(f"Error: {str(e)}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8. KNN (input file: newfeatures.csv)
+
+import pandas as pd
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+import matplotlib.pyplot as plt
+
+file_path = input("Enter the path to your CSV file : ")
+data = pd.read_csv(file_path)
+
+X = data.iloc[:, :-1].values
+y = data.iloc[:, -1].values
+
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(y)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+neighbors = np.arange(1, 9)
+train_accuracy = np.empty(len(neighbors))
+test_accuracy = np.empty(len(neighbors))
+
+for i, k in enumerate(neighbors):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train, y_train)
+
+    train_accuracy[i] = knn.score(X_train, y_train)
+    test_accuracy[i] = knn.score(X_test, y_test)
+
+plt.plot(neighbors, test_accuracy, label='Testing dataset Accuracy')
+plt.plot(neighbors, train_accuracy, label='Training dataset Accuracy')
+
+plt.legend()
+plt.xlabel('n_neighbors')
+plt.ylabel('Accuracy')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9. data preprocessing and cleaning
+
+import pandas as pd 
+import re 
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize 
+from nltk.stem import WordNetLemmatizer 
+import nltk 
+def preprocess_data(df): 
+    """ 
+    Performs general data preprocessing steps on a DataFrame. 
+    """ 
+    for col in df.select_dtypes(include=['number']).columns: 
+        df[col] = df[col].fillna(df[col].median()) 
+    # df = pd.get_dummies(df, columns=['categorical_column_name'], drop_first=True) 
+    return df 
+def clean_text(text): 
+    """ 
+    Performs text cleaning steps. 
+    """ 
+    text = text.lower() 
+    text = re.sub(r'[^a-zA-Z\s]', '', text) 
+    tokens = word_tokenize(text) 
+    stop_words = set(stopwords.words('english')) 
+    tokens = [word for word in tokens if word not in stop_words] 
+    lemmatizer = WordNetLemmatizer() 
+    tokens = [lemmatizer.lemmatize(word) for word in tokens] 
+    cleaned_text = ' '.join(tokens) 
+    return cleaned_text 
+    if __name__ == "__main__":
+        data = {'numerical_col': [10, 20, None, 40, 50], 
+            'categorical_col': ['A', 'B', 'A', 'C', 'B'], 
+            'text_data': ["This is some sample text for cleaning!", 
+                          "Another example sentence, with punctuation!", 
+                          "Stop words are removed here.", 
+                          "Lemmatization is also applied.", 
+                          "Final text cleaning example."]} 
+    df = pd.DataFrame(data) 
+    print("Original DataFrame:") 
+    print(df) 
+    df_preprocessed = preprocess_data(df.copy()) 
+    print("\nDataFrame after general data preprocessing:") 
+    print(df_preprocessed) 
+    df_preprocessed['cleaned_text'] = df_preprocessed['text_data'].apply(clean_text) 
+    print("\nDataFrame after text cleaning:") 
+    print(df_preprocessed[['text_data', 'cleaned_text']])
+
+
+
+
+10. BFS DFS 
+
+graph = { 
+    'A': ['B', 'C'], 
+    'B': ['D', 'E'], 
+    'C': ['F'], 
+    'D': [], 
+    'E': ['F'], 
+    'F': [] 
+} 
+# DFS (Recursive) 
+def dfs_recursive(node, visited=None): 
+    if visited is None: 
+        visited = set() 
+    visited.add(node) 
+    print(node, end=" ") 
+    for neighbour in graph[node]: 
+        if neighbour not in visited: 
+            dfs_recursive(neighbour, visited) 
+# DFS (Iterative Using Stack) 
+def dfs_iterative(start): 
+    visited = set() 
+    stack = [start] 
+    print("\nDFS Iterative:", end=" ") 
+    while stack: 
+        node = stack.pop() 
+        if node not in visited: 
+            print(node, end=" ") 
+            visited.add(node) 
+            stack.extend(graph[node][::-1]) 
+# BFS (Using Queue) 
+from collections import deque 
+def bfs(start): 
+    visited = set() 
+    queue = deque([start]) 
+    print("\nBFS:", end=" ") 
+    while queue: 
+        node = queue.popleft() 
+        if node not in visited: 
+            print(node, end=" ") 
+            visited.add(node)
+            queue.extend(graph[node])   # add neighbors 
+print("DFS Recursive:", end=" ") 
+dfs_recursive('A') 
+dfs_iterative('A') 
+bfs('A') 
+
+
+11. Locally weighted regression
+
+import numpy as np 
+import matplotlib.pyplot as plt 
+ 
+# --- 1. Data Generation --- 
+np.random.seed(42) 
+m = 100  # Number of data points 
+X_data = np.linspace(-3, 3, m) 
+# Non-linear function: sin(x) + some noise 
+Y_data = np.sin(X_data) * 2 + X_data * 0.5 + np.random.normal(0, 0.4, m) 
+ 
+# Prepare the design matrix X (add a column of ones for the intercept) 
+X_design = np.vstack([np.ones(m), X_data]).T 
+Y_data = Y_data.reshape(-1, 1) 
+ 
+# --- 2. The Locally Weighted Regression Function --- 
+def lwr_predict(X_design, Y_data, x_query, tau): 
+    """ 
+    Performs one prediction using Locally Weighted Regression. 
+     
+    X_design: The full design matrix (m x 2, with intercept column) 
+    Y_data: The full target vector (m x 1) 
+    x_query: The query point (scalar) 
+    tau: The bandwidth parameter 
+     
+    Returns: The predicted y-value for x_query. 
+    """ 
+    # Create the query design vector (1, x_query) 
+    x_query_vec = np.array([1, x_query])
+       # 1. Calculate weights W for all data points relative to x_query 
+    # Use only the feature values for the weight calculation (the second column of X_design) 
+    x_data_features = X_design[:, 1] 
+     
+    # Squared distance 
+    diff = x_data_features - x_query 
+    squared_dist = diff ** 2 
+     
+    # Gaussian weights 
+    weights = np.exp(-squared_dist / (2 * tau**2)) 
+    W = np.diag(weights) # W is a diagonal matrix 
+     
+    # 2. Closed-Form Solution for Theta: theta = (X^T W X)^-1 X^T W y 
+    XT_W = X_design.T @ W 
+     
+    # Calculate (X^T W X)^-1 
+    try: 
+        XT_W_X_inv = np.linalg.inv(XT_W @ X_design) 
+    except np.linalg.LinAlgError: 
+        # Handle the case where the matrix is singular (shouldn't happen with good data) 
+        return np.nan  
+         
+    # Calculate the parameters theta 
+    theta = XT_W_X_inv @ XT_W @ Y_data 
+     
+    # 3. Prediction: y_hat = theta^T x_query_vec 
+    y_hat = x_query_vec @ theta 
+     
+    return y_hat[0] 
+ 
+# --- 3. Run the Algorithm and Plot --- 
+def run_lwr(X_design, Y_data, tau): 
+    # Create a dense grid of query points for a smooth fit line 
+    X_test = np.linspace(X_design[:, 1].min(), X_design[:, 1].max(), 100) 
+     
+    # Get predictions for all test points 
+    Y_pred = [lwr_predict(X_design, Y_data, x_q, tau) for x_q in X_test] 
+     
+    # Plotting 
+    plt.figure(figsize=(10, 6)) 
+    plt.scatter(X_design[:, 1], Y_data, label='Data Points', color='skyblue', alpha=0.6) 
+    plt.plot(X_test, Y_pred, label=f'LWR Fit ($\u03c4$={tau})', color='darkred', linewidth=3) 
+     
+    plt.title(f' Locally Weighted Regression Fit with Bandwidth $\u03c4$={tau}') 
+    plt.xlabel('X Feature') 
+    plt.ylabel('Y Target') 
+    plt.legend() 
+    plt.grid(True, linestyle='--', alpha=0.7) 
+    plt.show() 
+ 
+# Run the experiment with different tau values to show the effect of the bandwidth 
+print("Running LWR with a narrow bandwidth (low bias, high variance)...") 
+run_lwr(X_design, Y_data, tau=0.2) # Narrow band (wobbly fit) 
+ 
+print("Running LWR with a wider bandwidth (high bias, low variance)...") 
+run_lwr(X_design, Y_data, tau=1.0) # Wide band (smooth fit, similar to global linear regression)
+
+
+
+
+12. POS Parts of Speech
+
+import spacy 
+try: 
+    nlp = spacy.load("en_core_web_sm") 
+except OSError: 
+    print("Error: The 'en_core_web_sm' model is not found.") 
+    print("Please run 'python -m spacy download en_core_web_sm' in your terminal.") 
+    exit() 
+text = "Apple Inc. announced the launch of its new product in London next month.Tim Cook, the CEO, expects the company to sell 10 million units." 
+doc = nlp(text) 
+print("--- Parts-of-Speech (POS) Tagging ---") 
+print("{:<15} {:<10} {:<10}".format("Token", "POS Tag", "Description")) 
+print("-" * 35) 
+for token in doc: 
+    print("{:<15} {:<10} {:<10}".format( 
+        token.text, 
+        token.pos_, 
+        spacy.explain(token.pos_) 
+    )) 
+print("\n--- Named Entity Recognition (NER) ---") 
+print("{:<20} {:<10} {:<30}".format("Entity Text", "Entity Type", "Description")) 
+print("-" * 60) 
+for ent in doc.ents: 
+    print("{:<20} {:<10} {:<30}".format( 
+        ent.text, 
+        ent.label_, 
+        spacy.explain(ent.label_) 
+    ))
+
+
+
