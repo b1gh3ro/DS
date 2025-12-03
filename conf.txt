@@ -1,537 +1,3430 @@
-Set 4​
-1.​ Display all the departments where department does not have any employees.
-SELECT d.deptno, d.dname
-FROM dept d
-LEFT JOIN emp e ON d.deptno = e.deptno
-WHERE e.empno IS NULL;
-​
-2.​ Display all the departments where department does have at least one employee.
-SELECT d.deptno, d.dname
-FROM dept d
-JOIN emp e ON d.deptno = e.deptno
-GROUP BY d.deptno, d.dname;
-3.​ Display all employees those who are not managers?
-SELECT empno, ename, job
-FROM emp
-WHERE empno NOT IN (SELECT DISTINCT mgr FROM emp WHERE mgr IS NOT
-NULL);
-4.​ Display ename, deptno from emp table with format of (ename) belongs to (deptno)
-SELECT ename || ' belongs to ' || deptno AS "Employee Department Info"
-FROM emp;
-5.​ Display total number of employees hired for 1980, 1981, 1982. The output should be
-in one record
-SELECT
-SUM(CASE WHEN TO_CHAR(hiredate, 'YYYY') = '1980' THEN 1 ELSE 0 END) AS "1980",
-SUM(CASE WHEN TO_CHAR(hiredate, 'YYYY') = '1981' THEN 1 ELSE 0 END) AS "1981",
-SUM(CASE WHEN TO_CHAR(hiredate, 'YYYY') = '1982' THEN 1 ELSE 0 END) AS "1982"
-FROM emp;
-1.​ Write a query to get 4th max salary from EMP table
-SELECT sal
-FROM (
-SELECT sal, DENSE_RANK() OVER (ORDER BY sal DESC) rank
-FROM emp
-)
-WHERE rank = 4;
-2.​ Write a query to get 2nd & 6th max salary from EMP table
-SELECT sal
-FROM (
-SELECT sal, DENSE_RANK() OVER (ORDER BY sal DESC) rank
-FROM emp
-)
-WHERE rank IN (2, 6);
-​
-3.​ Write a query to get first 3 salaries from the EMP table
-SELECT sal
-FROM (
-SELECT sal, DENSE_RANK() OVER (ORDER BY sal DESC) rank
-FROM emp
-)
-WHERE rank <= 3;
-1.​ Write a program to accept a mgr and display who are working under that mgr?
-SET SERVEROUTPUT ON;
-DECLARE
-v_mgr NUMBER := &enter_manager_number;
-CURSOR emp_cursor IS
-SELECT empno, ename, job
-FROM emp
-WHERE mgr = v_mgr; -- now v_mgr has value
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Job: ' || emp_rec.job);
-END LOOP;
-END;
-2.​ Write a program to accept the grade and display emps belongs to that grade?
-SET SERVEROUTPUT ON;
-DECLARE
-v_grade NUMBER := &enter_grade;
-CURSOR emp_cursor IS
-SELECT e.empno, e.ename, g.grade
-FROM emp e
-JOIN salgrade g
-ON e.sal BETWEEN g.losal AND g.hisal
-WHERE g.grade = v_grade;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Grade: ' || emp_rec.grade);
-END LOOP;
-END;
-3.​ Write a program to accept a deptno and display who are working in that dept?
-​
-SET SERVEROUTPUT ON;
-DECLARE
-v_deptno NUMBER := &Enter_Deptno; -- Accept deptno
-CURSOR emp_cursor IS
-SELECT empno, ename, job
-FROM emp
-WHERE deptno = v_deptno;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Job: ' || emp_rec.job);
-END LOOP;
-END;
-/
-1.​ Write a database trigger to store the deleted data of EMP table in
-EMPDEL table.
-CREATE OR REPLACE TRIGGER emp_delete_trigger
-AFTER DELETE ON emp
-FOR EACH ROW
-BEGIN
-INSERT INTO empdel (empno, ename, job, sal, deptno)
-VALUES (:OLD.empno, :OLD.ename, :OLD.job, :OLD.sal,
-:OLD.deptno);
-END;
-/
-​
-2.​ Write a database trigger display the message when the inserting
-hiredate is greater than system date
-CREATE OR REPLACE TRIGGER hiredate_check_trigger
-BEFORE INSERT ON emp
-FOR EACH ROW
-BEGIN
-IF :NEW.hiredate > SYSDATE THEN
-RAISE_APPLICATION_ERROR(-20001,'Hire date cannot be in the
-future.') ;
-ENDEND;
-/
-IF;
-3.​ Write a database trigger add Rs 500 if the inserting salary is less than
-Rs 1000
-​
-CREATE OR REPLACE TRIGGER salary_check_trigger
-BEFORE INSERT OR UPDATE ON emp
-FOR EACH ROW
-BEGIN
-IF :NEW.sal < 1000 THEN
-:NEW.sal := :NEW.sal + 500;
-END IF;
-END;
-/
-Set 5
-1. Write a program to accept the location and display empno, name, sal, date of join and
-also display the total salary, avg salary and no of emps?
-SET SERVEROUTPUT ON;
-DECLARE
-CURSOR emp_cursor (loc_name VARCHAR2) IS
-SELECT e.empno, e.ename, e.sal, e.hiredate
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE d.loc = loc_name;
-total_salary NUMBER := 0;
-emp_count NUMBER := 0;
-avg_salary NUMBER := 0;
-BEGIN
-FOR emp_rec IN emp_cursor('NEW YORK') LOOP
-total_salary := total_salary + emp_rec.sal;
-emp_count := emp_count + 1;
-DBMS_OUTPUT.PUT_LINE(
-'Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Salary: ' || emp_rec.sal ||
-', Hire Date: ' || emp_rec.hiredate
+1. Write a HTML Program to demonstrate Ordered and Unordered list tags.
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ordered and Unordered List Example</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+}
+h2 {
+color: #0066cc;
+}
+ol, ul {
+padding-left: 20px;
+}
+</style>
+</head>
+<body>
+<h2>Ordered List</h2>
+<ol>
+<li>First item</li>
+<li>Second item</li>
+<li>Third item</li>
+</ol>
+<h2>Unordered List</h2>
+<ul>
+<li>Apple</li>
+<li>Banana</li>
+<li>Cherry</li>
+</ul>
+</body>
+</html>
+
+2. Write a HTML program to display Time Table of MCA Course using all attributes of table tag.
+<!DOCTYPE html>
+<html>
+<head>
+<title>MCA Course Time Table</title>
+</head>
+<body>
+<h2 align="center">MCA Course Time Table</h2>
+<table border="1" cellpadding="8" cellspacing="0" width="80%" align="center"
+bgcolor="#f2f2f2">
+<tr bgcolor="#add8e6">
+<th>Day/Time</th>
+<th>9:00 - 10:00</th>
+<th>10:00 - 11:00</th>
+<th>11:00 - 12:00</th>
+<th>12:00 - 1:00</th>
+<th>1:00 - 2:00</th>
+<th>2:00 - 3:00</th>
+<th>3:00 - 4:00</th>
+</tr>
+<tr>
+<th>Monday</th>
+<td>Data Structures</td>
+<td>Operating Systems</td>
+<td>DBMS</td>
+<td rowspan="5" align="center">Lunch Break</td>
+<td>Web Programming</td>
+<td colspan="2" align="center">Python Lab</td>
+</tr>
+<tr>
+<th>Tuesday</th>
+<td>Computer Networks</td>
+<td>Java</td>
+<td>DBMS</td>
+<td>Operating Systems</td>
+<td>Web Programming</td>
+<td>Sports</td>
+</tr>
+<tr>
+<th>Wednesday</th>
+<td>Data Structures</td>
+<td>Java</td>
+<td>DBMS</td>
+<td>Operating Systems</td>
+<td colspan="2" align="center">Mini Project</td>
+</tr>
+<tr>
+<th>Thursday</th>
+<td>Computer Networks</td>
+<td>Operating Systems</td>
+<td>DBMS Lab</td>
+<td colspan="2" align="center">DBMS Lab</td>
+<td>Sports</td>
+</tr>
+<tr>
+<th>Friday</th>
+<td>Java</td>
+<td>Computer Networks</td>
+<td>Data Structures</td>
+<td>Data Structures</td>
+<td colspan="2" align="center">Seminar</td>
+</tr>
+</table>
+</body>
+</html>
+
+3. Write a HTML program to demonstrate ONCLICK and ONLOAD
+<!DOCTYPE html>
+<html>
+<head>
+<title>ONCLICK and ONLOAD Example</title>
+<script>
+function pageLoaded() {
+alert("Welcome! This alert is shown using ONLOAD.");
+}
+function showMessage() {
+alert("Button was clicked! This is ONCLICK.");
+}
+</script>
+</head>
+<body onload="pageLoaded()">
+<h2>ONCLICK and ONLOAD Example</h2>
+<p>Click the button below to see the ONCLICK event in action:</p>
+<button onclick="showMessage()">Click Me</button>
+</body>
+</html>
+
+4. Write a HTML program to demonstrate MOUSE EVENTS
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mouse Events Example</title>
+<script>
+function mouseOver() {
+document.getElementById("text").style.color = "blue";
+}
+function mouseOut() {
+document.getElementById("text").style.color = "black";
+}
+function mouseClick() {
+alert("Paragraph clicked!");
+}
+</script>
+</head>
+<body>
+<h2>Mouse Events Demo</h2>
+<p id="text" onmouseover="mouseOver()" onmouseout="mouseOut()"
+onclick="mouseClick()">
+Hover over this text and click it!
+</p>
+</body>
+</html>
+
+5. Design a Home page of online Shopping web site that contains different products with images. Create image of the products as hyperlinks to display the Description of products.
+Index.html:
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Shopping - Home</title>
+</head>
+<body style="font-family: Arial; background-color: #f0f0f0; text-align: center;">
+<h1>Welcome to Online Shopping</h1>
+<p>Click on a product to view more details:</p>
+<a href="product1.html">
+<img src="phone.jpg" alt="Smartphone" width="200">
+</a><br><br>
+<a href="product2.html">
+<img src="laptop.jpg" alt="Laptop" width="200">
+</a><br><br>
+<a href="product3.html">
+<img src="shoes.jpg" alt="Shoes" width="200">
+</a>
+</body>
+</html>
+product1.html
+<!DOCTYPE html>
+<html>
+<head><title>Smartphone</title></head>
+<body style="font-family: Arial;">
+<h1>Smartphone</h1>
+<p>This smartphone has a great camera, fast processor, and long battery life.</p>
+<a href="index.html">Back to Home</a>
+</body>
+</html>
+product2.html
+<!DOCTYPE html>
+<html>
+<head><title>Laptop</title></head>
+<body style="font-family: Arial;">
+<h1>Laptop</h1>
+<p>This laptop is perfect for gaming, work, and entertainment.</p>
+<a href="index.html">Back to Home</a>
+</body>
+</html>
+product3.html
+<!DOCTYPE html>
+<html>
+<head><title>Shoes</title></head>
+<body style="font-family: Arial;">
+<h1>Running Shoes</h1>
+<p>Comfortable and stylish running shoes for daily wear.</p>
+<a href="index.html">Back to Home</a>
+</body>
+</html>
+
+6. Design the following web pages of college web site and link these pages to home page using frames in HTML-Home, About Us, Courses Offered, Admissions.i.index.html (Home Page with Frameset)
+index.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>College Website</title>
+</head>
+<frameset rows="20%,80%">
+<frame src="home.html" name="topFrame" scrolling="no" noresize>
+<frameset cols="20%,80%">
+<frame src="menu.html" name="menuFrame">
+<frame src="about.html" name="contentFrame">
+</frameset>
+</frameset>
+</html>
+menu.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Menu</title>
+</head>
+<body bgcolor="#f0f0f0">
+<h3>Navigation</h3>
+<ul>
+<li><a href="home.html" target="topFrame">Home</a></li>
+<li><a href="about.html" target="contentFrame">About Us</a></li>
+<li><a href="courses.html" target="contentFrame">Courses Offered</a></li>
+<li><a href="admissions.html" target="contentFrame">Admissions</a></li>
+</ul>
+</body>
+</html>
+HOME.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Home</title>
+</head>
+<body bgcolor="#003366" text="white">
+<h1 style="text-align: center;">Welcome to ABC College</h1>
+</body>
+</html>
+about.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>About Us</title>
+</head>
+<body>
+<h2>About Us</h2>
+<p>ABC College was established in 1990 and has been providing quality education in various disciplines.</p>
+</body>
+</html>
+courses.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Courses Offered</title>
+</head>
+<body>
+<h2>Courses Offered</h2>
+<ul>
+<li>B.Sc Computer Science</li>
+<li>B.Com</li>
+<li>BA English</li>
+<li>BBA</li>
+</ul>
+</body>
+</html>
+admissions.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admissions</title>
+</head>
+<body>
+<h2>Admissions</h2>
+<p>Admissions open from June 1st. Fill the application online or visit our campus for more details.</p>
+</body>
+</html>
+
+7. Design the following static web pages required for Library Management System web site and link these pages to home page using hyperlinks in HTML. Home, About Us, List of Books, l.index.html (Home Page):
+Index.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Library Management System</title>
+</head>
+<body style="font-family: Arial; background-color: #f2f2f2;">
+<h1>Welcome to the Library Management System</h1>
+<nav>
+<a href="index.html">Home</a> |
+<a href="about.html">About Us</a> |
+<a href="books.html">List of Books</a>
+</nav>
+<hr>
+<p>This is the home page of the Library Management System. Use the links above to navigate through the site.</p>
+</body>
+</html>
+about.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>About Us - Library</title>
+</head>
+<body style="font-family: Arial; background-color: #f9f9f9;">
+<h1>About Us</h1>
+<nav>
+<a href="index.html">Home</a> |
+<a href="about.html">About Us</a> |
+<a href="books.html">List of Books</a>
+</nav>
+<hr>
+<p>Our library was established in 1995 and houses over 10,000 books covering all major disciplines. We aim to provide easy and free access to knowledge for students and the public.</p>
+</body>
+</html>
+books.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>List of Books - Library</title>
+</head>
+<body style="font-family: Arial; background-color: #fff;">
+<h1>List of Books</h1>
+<nav>
+<a href="index.html">Home</a> |
+<a href="about.html">About Us</a> |
+<a href="books.html">List of Books</a>
+</nav>
+<hr>
+<ul>
+<li>The Alchemist by Paulo Coelho</li>
+<li>Wings of Fire by A.P.J. Abdul Kalam</li>
+<li>To Kill a Mockingbird by Harper Lee</li>
+<li>1984 by George Orwell</li>
+<li>Rich Dad Poor Dad by Robert Kiyosaki</li>
+</ul>
+</body>
+</html>
+
+8. To use frames to implement a restaurant webpage.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pizza Order Form</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+}
+table {
+border-collapse: collapse;
+width: 50%;
+margin-bottom: 20px;
+}
+th, td {
+border: 1px solid #000;
+padding: 10px;
+text-align: left;
+}
+th {
+background-color: #f4f4f4;
+}
+input[type="text"], input[type="number"] {
+width: 100%;
+padding: 5px;
+box-sizing: border-box;
+}
+button {
+padding: 10px 15px;
+margin: 5px;
+cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:center;align-items:center;">
+<div >
+<h1 style="margin-left: 75px;">Pizza Order Form</h1>
+<form id="pizzaForm" >
+<table style="min-width: 400px;">
+<thead>
+<tr>
+<th>Item Name</th>
+<th>Price</th>
+<th>Quantity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chicken Pizza</td>
+<td>100</td>
+<td><input type="number" id="chickenQty" min="0" value="0"></td>
+</tr>
+<tr>
+<td>Paneer Pizza</td>
+<td>80</td>
+<td><input type="number" id="paneerQty" min="0" value="0"></td>
+</tr>
+<tr>
+<td>Veg Pizza</td>
+<td>70</td>
+<td><input type="number" id="vegQty" min="0" value="0"></td>
+</tr>
+</tbody>
+</table>
+<label for="totalCost">Total Cost:</label>
+<input type="text" id="totalCost" readonly>
+<br><br>
+<button type="button" onclick="calculateTotal()">Calculate Total</button>
+<button type="button" onclick="confirmOrder()">Confirm Order</button>
+<button type="button" onclick="cancelOrder()">Cancel Order</button>
+</form>
+</div>
+</div>
+<script>
+function calculateTotal() {
+const chickenQty = parseInt(document.getElementById('chickenQty').value) || 0;
+const paneerQty = parseInt(document.getElementById('paneerQty').value) || 0;
+const vegQty = parseInt(document.getElementById('vegQty').value) || 0;
+const chickenPrice = 100;
+const paneerPrice = 80;
+const vegPrice = 70;
+const totalCost = (chickenQty * chickenPrice) + (paneerQty * paneerPrice) +
+(vegQty * vegPrice);
+document.getElementById('totalCost').value = totalCost;
+}
+function confirmOrder() {
+const totalCost = document.getElementById('totalCost').value;
+if (totalCost === "" || totalCost === "0") {
+alert("Please calculate the total cost before confirming the order.");
+return;
+}
+alert("Your order is confirmed. It will reach you in 10 minutes.");
+}
+function cancelOrder() {
+document.getElementById('pizzaForm').reset();
+document.getElementById('totalCost').value = "";
+}
+</script>
+</body>
+</html>
+
+9. Write a HTML page that has one input, which can take multi-line text and a submit button. Once the user clicks the submit button, it should show the number of characters, words and lines in the text entered using an alert message. Words are separated with white spaces and lines are separated with new line character.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Text Statistics</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+}
+textarea, button {
+padding: 10px;
+margin: 5px 0;
+}
+</style>
+</head>
+<body>
+<h1>Text Statistics</h1>
+<label for="textInput">Enter your text below:</label><br>
+<textarea id="textInput" rows="10" cols="50" placeholder="Type your text
+here..."></textarea><br>
+<button onclick="calculateStats()">Submit</button>
+<script>
+function calculateStats() {
+const text = document.getElementById("textInput").value;
+const charCount = text.length;
+const wordCount = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+const lineCount = text.split("\n").length;
+alert(`Characters: ${charCount}\nWords: ${wordCount}\nLines: ${lineCount}`);
+}
+</script>
+</body>
+</html>
+
+10. Develop and demonstrate the usage of inline, internal and external style sheet using CSS.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CSS Styling Demonstration</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+background-color: #f5f5f5;
+margin: 0;
+padding: 0;
+}
+.internal-style {
+color: blue;
+text-align: center;
+}
+.external-style {
+color: purple;
+font-size: 18px;
+text-align: justify;
+}
+footer {
+background-color: #333;
+color: white;
+text-align: center;
+padding: 10px 0;
+}
+</style>
+</head>
+<body>
+<header>
+<h1 style="color: red;">Inline CSS Example</h1>
+</header>
+<main>
+<p class="internal-style">This paragraph is styled using Internal CSS.</p>
+<p class="external-style">This paragraph is styled using External CSS.</p>
+</main>
+<footer>
+<p style="color: green;">This footer is styled using Inline CSS.</p>
+</footer>
+</body>
+</html>
+
+11. Develop College Website using HTML5 and CSS
+Index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Osmania College</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+<div class="container">
+<h1>Osmania College</h1>
+<nav>
+<ul>
+<li><a href="#home">Home</a></li>
+<li><a href="#about">About Us</a></li>
+<li><a href="#courses">Courses</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</nav>
+</div>
+</header>
+<section id="home" class="hero">
+<div class="container">
+<h2>Welcome to Osmania College</h2>
+<p>Your future begins here. Learn, grow, and succeed with us.</p>
+</div>
+</section>
+<section id="about">
+<div class="container">
+<h2>About Us</h2>
+<p>Osmania College was established in 1990. We are dedicated to excellence in
+teaching and innovation, offering a range of undergraduate and postgraduate programs.</p>
+</div>
+</section>
+<section id="courses">
+<div class="container">
+<h2>Courses Offered</h2>
+<ul>
+<li>B.Sc Computer Science</li>
+<li>B.Com</li>
+<li>BBA</li>
+<li>BA English</li>
+</ul>
+</div>
+</section>
+<section id="contact">
+<div class="container">
+<h2>Contact Us</h2>
+<p>Email: info@osmaniacollege.edu | Phone: +91-12345-67890</p>
+<p>Address: 123 Main Road, City, State, Country</p>
+</div>
+</section>
+<footer>
+<div class="container">
+<p>&copy; 2025 Osmanania College. All rights reserved.</p>
+</div>
+</footer>
+</body>
+</html>
+styles.css
+*
+{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+body {
+font-family: 'Segoe UI', sans-serif;
+line-height: 1.6;
+background-color: #f4f4f4;
+color: #333;
+}
+.container {
+width: 90%;
+max-width: 1200px;
+margin: auto;
+padding: 20px 0;
+}
+header {
+background: #003366;
+color: white;
+padding: 20px 0;
+}
+header h1 {
+text-align: center;
+margin-bottom: 10px;
+}
+nav ul {
+display: flex;
+justify-content: center;
+list-style: none;
+}
+nav ul li {
+margin: 0 15px;
+}
+nav ul li a {
+color: white;
+text-decoration: none;
+font-weight: bold;
+}
+nav ul li a:hover {
+text-decoration: underline;
+}
+.hero {
+background: #cce5ff;
+text-align: center;
+padding: 60px 20px;
+}
+section {
+padding: 40px 0;
+}
+h2 {
+margin-bottom: 20px;
+color: #003366;
+}
+ul {
+list-style-type: disc;
+padding-left: 40px;
+}
+footer {
+background: #003366;
+color: white;
+text-align: center;
+padding: 20px 0;
+}
+
+12. Write an HTML page that contains a selection box with a list of 5 countries. When the user selects a country, its capital should be printed next to the list. Add CSS to customize the properties of the font of the capital (color, bold and font size).
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Country and Capital</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+}
+select {
+padding: 10px;
+font-size: 16px;
+margin-right: 10px;
+}
+.capital {
+font-weight: bold;
+font-size: 18px;
+color: #007BFF; /* Blue color */
+}
+</style>
+</head>
+<body>
+<h1>Country and Capital</h1>
+<label for="countrySelect">Select a country:</label>
+<select id="countrySelect" onchange="showCapital()">
+<option value="" disabled selected>Select a country</option>
+<option value="India">India</option>
+<option value="USA">USA</option>
+<option value="France">France</option>
+<option value="Japan">Japan</option>
+<option value="Australia">Australia</option>
+</select>
+<span class="capital" id="capitalDisplay"></span>
+<script>
+function showCapital() {
+const countryToCapital = {
+"India": "New Delhi",
+"USA": "Washington, D.C.",
+"France": "Paris",
+"Japan": "Tokyo",
+"Australia": "Canberra"
+};
+const selectedCountry = document.getElementById("countrySelect").value;
+const capitalDisplay = document.getElementById("capitalDisplay");
+capitalDisplay.textContent = countryToCapital[selectedCountry] || "";
+}
+</script>
+</body>
+</html>
+
+13. Write a program that changes the background color of a webpage dynamically using inline styles, and also includes a button to toggle between two external stylesheets.
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dynamic Styles and Stylesheet Toggle</title>
+<link id="styleSheet" rel="stylesheet" href="style1.css">
+<script>
+function changeBgColor(color) {
+document.body.style.backgroundColor = color;
+}
+function toggleStyleSheet() {
+var sheet = document.getElementById("styleSheet");
+if (sheet.getAttribute("href") === "style1.css") {
+sheet.setAttribute("href", "style2.css");
+} else {
+sheet.setAttribute("href", "style1.css");
+}
+}
+</script>
+</head>
+<body>
+<h2>Dynamic Background Color and Stylesheet Toggle</h2>
+<button onclick="changeBgColor('lightblue')">Light Blue</button>
+<button onclick="changeBgColor('lightgreen')">Light Green</button>
+<button onclick="changeBgColor('lightpink')">Light Pink</button>
+<br><br>
+<button onclick="toggleStyleSheet()">Toggle Stylesheet</button>
+<p>This paragraph will reflect styles from the external stylesheet.</p>
+</body>
+</html>
+style1.css
+body {
+font-family: Arial, sans-serif;
+color: darkblue;
+}
+p {
+font-size: 18px;
+}
+style2.css
+body {
+font-family: "Courier New", monospace;
+color: darkgreen;
+}
+p {
+font-size: 20px;
+font-weight: bold;
+}
+
+14. Write a program to create blurred pictures and text with different direction and strength using Motion Blur filter in CSS.
+<!DOCTYPE html>
+<html>
+<head>
+<title>Motion Blur Simulation in CSS</title>
+<style>
+.container {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+justify-content: center;
+padding: 20px;
+}
+.blur-horizontal {
+filter: blur(0.5px);
+transform: translateX(3px);
+}
+.blur-vertical {
+filter: blur(1px);
+transform: translateY(5px);
+}
+.blur-strong {
+filter: blur(4px);
+transform: translateX(10px);
+}
+.text-blur {
+color: black;
+font-size: 24px;
+text-shadow: 5px 0 3px rgba(0,0,0,0.3); /* horizontal motion blur simulation */
+}
+.text-blur-vertical {
+color: darkblue;
+font-size: 24px;
+text-shadow: 0 5px 3px rgba(0,0,0,0.3);
+/* vertical motion blur simulation */
+}
+img {
+width: 200px;
+height: auto;
+}
+</style>
+</head>
+<body>
+<h2 align="center">CSS Motion Blur Simulation</h2>
+<div class="container">
+<div>
+<p>Original Image</p>
+<img src="image.jpg" alt="Original">
+</div>
+<div>
+<p>Horizontal Motion Blur</p>
+<img src="image.jpg" class="blur-horizontal" alt="Horizontal Blur">
+</div>
+<div>
+<p>Vertical Motion Blur</p>
+<img src="image.jpg" class="blur-vertical" alt="Vertical Blur">
+</div>
+<div>
+<p>Strong Motion Blur</p>
+<img src="image.jpg" class="blur-strong" alt="Strong Blur">
+</div>
+</div>
+<div class="container">
+<div>
+<p class="text-blur">This is Horizontal Blurred Text</p>
+</div>
+<div>
+<p class="text-blur-vertical">This is Vertical Blurred Text</p>
+</div>
+</div>
+</body>
+</html>
+
+15. Drag the W3Schools image into the rectangle and repeating an Image Border
+<!DOCTYPE html>
+<html>
+<head>
+<title>Drag and Drop with Image Border</title>
+<style>
+#dropZone {
+width: 300px;
+height: 200px;
+border: 20px solid transparent;
+border-image: url('border.png') 30 round; /* image border with repeating */
+text-align: center;
+line-height: 160px;
+margin: 20px auto;
+background-color: #f0f0f0;
+}
+#w3Image {
+width: 150px;
+cursor: grab;
+}
+</style>
+</head>
+<body>
+<h2 align="center">Drag W3Schools Image into Rectangle</h2>
+<div align="center">
+<img src="https://www.w3schools.com/images/w3schools_green.jpg" id="w3Image"
+draggable="true" ondragstart="drag(event)">
+</div>
+<div id="dropZone" ondrop="drop(event)" ondragover="allowDrop(event)">
+Drop Here
+</div>
+<script>
+function allowDrop(ev) {
+ev.preventDefault();
+}
+function drag(ev) {
+ev.dataTransfer.setData("text", ev.target.id);
+}
+function drop(ev) {
+ev.preventDefault();
+var data = ev.dataTransfer.getData("text");
+var draggedImage = document.getElementById(data);
+ev.target.innerHTML = "";
+ev.target.appendChild(draggedImage);
+}
+</script>
+</body>
+</html>
+
+16. Demonstrate TRANSITIONS and TRANSFORMATION
+<!DOCTYPE html>
+<html>
+<head>
+<title>Transitions and Transformations Demo</title>
+<style>
+.box {
+width: 150px;
+height: 150px;
+background-color: teal;
+margin: 50px;
+transition: all 0.5s ease; /* transition applied */
+}
+.box:hover {
+background-color: orange; /* transition color change */
+transform: scale(1.2) rotate(20deg) translateX(30px);
+/* transformation */
+}
+.text {
+font-size: 20px;
+transition: color 1s, transform 1s;
+}
+.text:hover {
+color: purple;
+transform: skewX(20deg);
+}
+</style>
+</head>
+<body>
+<h2 align="center">CSS Transitions and Transformations Demo</h2>
+<div class="box"></div>
+<p class="text">Hover over this text to see skew transformation and color transition.</p>
+</body>
+</html>
+
+17. Create a student Registration form for Job Application and validate the form fields using JavaScript.
+<html>
+<body>
+<h2>Student Job Application Form</h2>
+<form onsubmit="return validateForm()">
+Name: <input type="text" id="name"><br><br>
+Email: <input type="text" id="email"><br><br>
+Phone: <input type="text" id="phone"><br><br>
+Gender:
+<select id="gender">
+<option value="">Select</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select><br><br>
+Date of Birth: <input type="date" id="dob"><br><br>
+Qualification:
+<select id="qualification">
+<option value="">Select</option>
+<option>B.Tech</option>
+<option>B.Sc</option>
+<option>MCA</option>
+</select><br><br>
+Upload Resume: <input type="file" id="resume"><br><br>
+Password: <input type="password" id="password"><br><br>
+<p id="error" style="color:red;"></p>
+<input type="submit" value="Register">
+</form>
+<script>
+function validateForm() {
+var name = document.getElementById("name").value;
+var email = document.getElementById("email").value;
+var phone = document.getElementById("phone").value;
+var gender = document.getElementById("gender").value;
+var dob = document.getElementById("dob").value;
+var qualification = document.getElementById("qualification").value;
+var resume = document.getElementById("resume").value;
+var password = document.getElementById("password").value;
+var error = document.getElementById("error");
+if (
+name === "" ||
+email === "" ||
+phone === "" ||
+gender === "" ||
+dob === "" ||
+qualification === "" ||
+resume === "" ||
+password === ""
+) {
+error.innerHTML = "Please fill all fields.";
+return false;
+}
+if (!email.includes("@") || !email.includes(".")) {
+error.innerHTML = "Invalid email.";
+return false;
+}
+if (phone.length !== 10) {
+error.innerHTML = "Phone must be 10 digits.";
+return false;
+}
+if (password.length < 6) {
+error.innerHTML = "Password must be at least 6 characters.";
+return false;
+}
+alert("Form submitted successfully!");
+return true;
+}
+</script>
+</body>
+</html>
+
+18. Develop and demonstrate a HTML file that includes Java script for the following problems input: A number n obtained using prompt Output: The first n Fibonacci numbers
+<html>
+<body>
+<h3>Fibonacci Numbers</h3>
+<script>
+var n = parseInt(prompt("Enter how many Fibonacci numbers to print:"));
+if ( n <= 0) {
+document.write("Please enter a valid positive number.");
+} else {
+var a = 0, b = 1, c;
+var result = "";
+for (var i = 0; i < n; i++) {
+result += a + " ";
+c = a + b;
+a = b;
+b = c;
+}
+document.write("First " + n + " Fibonacci numbers:<br>" + result);
+}
+</script>
+</body>
+</html>
+
+19. Write a program that initializes an array of numbers, removes the first element, adds a new element to the end, and logs the modified array.
+<html>
+<body>
+<h3>Array operation</h3>
+<script>
+var input = prompt("Enter numbers separated by commas:");
+var arr = input.split(",");
+document.write("Original Array: " + input + "<br><br>");
+var newElement = prompt("Enter a number to add at the end:");
+arr.shift();
+arr.push(newElement);
+document.write("Modified Array: " + arr);
+</script>
+</body>
+</html>
+
+20. Create a function that accepts an array by reference, modifies it by doubling all its elements, and returns the modified array.
+<html>
+<body>
+<h3>Double Array Elements (Dynamic Input)</h3>
+<script>
+function doubleArray(arr) {
+for (var i = 0; i < arr.length; i++) {
+arr[i] = arr[i] * 2;
+}
+return arr;
+}
+var input = prompt("Enter numbers separated by commas:");
+var numbers = input.split(",").map(Number);
+document.write("Original Array: " + numbers + "<br><br>");
+var modified = doubleArray(numbers);
+document.write("Modified Array (Doubled): " + modified);
+</script>
+</body>
+</html>
+
+21. Write a function that accepts an array and returns the average of the numbers in that array.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Array Average Calculator</title>
+</head>
+<body style="text-align: center;">
+<h2>Average of Numbers</h2>
+<p>Enter numbers separated by commas:</p>
+<input type="text" id="numbers">
+<button onclick="calculateAverage()">Calculate Average</button>
+<p id="avgResult"></p>
+<script>
+function calculateAverage() {
+const input = document.getElementById("numbers").value;
+const nums = input.split(',').map(Number).filter(n => !isNaN(n));
+if (nums.length === 0) {
+document.getElementById("avgResult").innerText = "Please enter valid numbers.";
+return;
+}
+const sum = nums.reduce((acc, val) => acc + val, 0);
+const avg = sum / nums.length;
+document.getElementById("avgResult").innerText = "Average: " + avg.toFixed(2);
+}
+</script>
+</body>
+</html>
+
+22. Write a program that uses a 2D array to store a matrix and calculates the sum of each column.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Matrix Column Sum</title>
+</head>
+<body style="text-align: center;">
+<h2>Matrix Column Sum Calculator</h2>
+<p>Enter matrix rows (comma-separated numbers, one row per line):</p>
+<textarea id="matrixInput" rows="5" cols="40"></textarea><br><br>
+<button onclick="calculateColumnSums()">Calculate Column Sums</button>
+<p id="matrixResult"></p>
+<script>
+function calculateColumnSums() {
+const rawInput = document.getElementById("matrixInput").value.trim();
+const rows = rawInput.split('\n').map(row => row.split(',').map(Number));
+if (rows.length === 0 || rows.some(r => r.some(isNaN))) {
+document.getElementById("matrixResult").innerText = "Invalid matrix input.";
+return;
+}
+const cols = rows[0].length;
+const sums = Array(cols).fill(0);
+for (let r of rows) {
+if (r.length !== cols) {
+document.getElementById("matrixResult").innerText = "Rows must have same
+number of columns.";
+return;
+}
+for (let i = 0; i < cols; i++) {
+sums[i] += r[i];
+}
+}
+document.getElementById("matrixResult").innerText = "Column Sums: " +
+sums.join(", ");
+}
+</script>
+</body>
+</html>
+
+23. Create a function that calculates the area of a circle given its radius using the Math object.
+area.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <title>Circle Area Calculator</title>
+</head>
+<body style="text-align: center;">
+ <h2>Circle Area Calculator</h2>
+ <p>Enter Radius of the Circle:</p>
+ <input type="number" id="radius">
+ <button onclick="calculateArea()">Calculate Area</button>
+ <p id="result"></p>
+ <script>
+ function calculateArea() {
+ let r = document.getElementById('radius').value;
+ let area = Math.PI * Math.pow(r, 2);
+document.getElementById('result').innerText = "Area of Circle: " +
+area.toFixed(2) + " sq. units";
+}
+ </script>
+</body>
+</html>
+
+24. Write a program that uses the String object to reverse a given string.
+s_reverse.html
+<!DOCTYPE html>
+<html>
+<head>
+ <title>String Reverser</title>
+</head>
+<body style="text-align: center; margin-top: 50px;">
+ <h2>String Reverser</h2>
+ <label for="inputString">Enter a string:</label>
+ <input type="text" id="inputString" />
+<button onclick="reverseString()">Reverse</button>
+ <p id="result"></p>
+ <script>
+ function reverseString() {
+ const str = document.getElementById("inputString").value;
+const reversed = str.split('').reverse().join('');
+ document.getElementById("result").innerText = "Reversed string: " + reversed;
+}
+ </script>
+</body>
+</html>
+
+25. Write a function that checks if a number is an integer and returns a Boolean value indicating whether it is true or false.
+<!DOCTYPE html>
+<html>
+<head>
+<title>Check if Number is Integer</title>
+<script>
+function isInteger(num) {
+return Number.isInteger(num);
+// Alternatively, manual check:
+// return typeof num === 'number' && num % 1 === 0;
+}
+function checkNumber() {
+var input = document.getElementById("numInput").value;
+var number = Number(input); // convert input to number
+var result = isInteger(number);
+document.getElementById("result").innerHTML =
+"Is " + input + " an integer? -> " + result;
+}
+</script>
+</head>
+<body>
+<h2>Check if a Number is Integer</h2>
+<input type="text" id="numInput" placeholder="Enter a number">
+<button onclick="checkNumber()">Check</button>
+<p id="result"></p>
+</body>
+</html>
+
+26. Develop and demonstrate JavaScript with POP-UP boxes and functions for the following problem. Input: A number n obtained using prompt. Output: A multiplication table of numbers from 1 to 10 of n using alert
+<!DOCTYPE html>
+<html>
+<head>
+<title>Multiplication Table using JS Pop-Ups</title>
+<script>
+function showMultiplicationTable() {
+var n = prompt("Enter a number:");
+n = Number(n); // convert to number
+if (isNaN(n)) {
+alert("Invalid input. Please enter a valid number.");
+return;
+}
+var table = "Multiplication Table of " + n + ":\n";
+for (var i = 1; i <= 10; i++) {
+table += n + " x " + i + " = " + (n * i) + "\n";
+}
+alert(table);
+}
+</script>
+</head>
+<body onload="showMultiplicationTable()">
+<h2>Multiplication Table using JavaScript Pop-Up Boxes</h2>
+<p>Check the alert box for output.</p>
+</body>
+</html>
+
+27. Develop and demonstrate a HTML file that includes Java script for the following problems: Input: A number n obtained using prompt Output: A table of numbers from 1 to n and their squares using alert
+<!DOCTYPE html>
+<html>
+<head>
+<title>Numbers and Squares using JS Pop-Ups</title>
+<script>
+function showSquaresTable() {
+var n = prompt("Enter a number:");
+n = Number(n); // Convert input to number
+if (isNaN(n) || n < 1) {
+alert("Invalid input. Please enter a positive number.");
+return;
+}
+var result = "Number\tSquare\n";
+for (var i = 1; i <= n; i++) {
+result += i + "\t" + (i * i) + "\n";
+}
+alert(result);
+}
+</script>
+</head>
+<body onload="showSquaresTable()">
+<h2>Numbers and their Squares using JavaScript Pop-Up Boxes</h2>
+<p>Check the alert box for output when the page loads.</p>
+</body>
+</html>
+
+28. Write a Java script with string processing and regular expressions
+<!DOCTYPE html>
+<html>
+<head>
+<title>String Processing and RegEx Demo</title>
+<script>
+function processString() {
+var input = prompt("Enter a sentence:");
+// 1. Check if string contains only alphabets and spaces
+var alphaRegex = /^[A-Za-z\s]+$/;
+var isAlphabetic = alphaRegex.test(input);
+// 2. Replace multiple spaces with a single space
+var cleaned = input.replace(/\s+/g, ' ').trim();
+// 3. Extract all words into an array
+var words = cleaned.split(" ");
+// Prepare output message
+var message = "Original Input: " + input + "\n";
+message += "Contains only alphabets and spaces? " + isAlphabetic + "\n";
+message += "Cleaned String (single spaces): " + cleaned + "\n";
+message += "Words Extracted (" + words.length + "): " + words.join(", ");
+// Display result using alert
+alert(message);
+}
+</script>
+</head>
+<body onload="processString()">
+<h2>JavaScript String Processing with RegEx</h2>
+<p>Check the alert box for output when page loads.</p>
+</body>
+</html>
+
+29. Write a Java script that can handle form data submitted via post
+<!DOCTYPE html>
+<html>
+<head>
+<title>Form POST with JavaScript</title>
+<script>
+function submitForm(event) {
+event.preventDefault();
+// prevent default form submission
+var formData = new FormData(document.getElementById("myForm"));
+// Convert form data to JSON object
+var jsonData = {};
+formData.forEach(function(value, key){
+jsonData[key] = value;
+});
+// Display data before POST
+alert("Form data to be sent: " + JSON.stringify(jsonData));
+// POST request using fetch
+fetch('https://httpbin.org/post', { // using httpbin for demo POST endpoint
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(jsonData)
+})
+.then(response => response.json())
+.then(data => {
+console.log(data);
+alert("POST request successful!\nResponse: " + JSON.stringify(data.json));
+})
+.catch(error => {
+console.error('Error:', error);
+alert("POST request failed.");
+});
+}
+</script>
+</head>
+<body>
+<h2>Form POST Submission using JavaScript Fetch</h2>
+<form id="myForm" onsubmit="submitForm(event)">
+Name: <input type="text" name="name" required><br><br>
+Email: <input type="email" name="email" required><br><br>
+<button type="submit">Submit</button>
+</form>
+<p>Check console or alert box for POST response.</p>
+</body>
+</html>
+
+30. Write an HTML page including any required JavaScript that takes a number from text field in the range of 0 to 999 and shows it in words. It should not accept four and above digits, alphabets and special characters.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Number to Words</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 50px;
+}
+.container {
+max-width: 500px;
+margin: auto;
+padding: 20px;
+border: 1px solid #ccc;
+border-radius: 8px;
+background-color: #f9f9f9;
+}
+input {
+width: 100%;
+padding: 10px;
+margin: 10px 0;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
+button {
+padding: 10px 20px;
+border: none;
+border-radius: 4px;
+background-color: #007BFF;
+color: #fff;
+cursor: pointer;
+}
+button:hover {
+background-color: #0056b3;
+}
+.output {
+margin-top: 20px;
+font-size: 18px;
+font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Number to Words Converter</h2>
+<form id="numberForm">
+<label for="number">Enter a number (0-999):</label>
+<input type="text" id="number" name="number" placeholder="Enter a number">
+<button type="button" onclick="convertToWords()">Convert</button>
+</form>
+<div class="output" id="output"></div>
+</div>
+<script>
+function convertToWords() {
+const numberInput = document.getElementById("number").value.trim();
+const outputDiv = document.getElementById("output");
+outputDiv.textContent = "";
+if (!/^\d+$/.test(numberInput)) {
+outputDiv.textContent = "Invalid input. Please enter a valid number (0-999).";
+return;
+}
+const number = parseInt(numberInput, 10);
+if (number < 0 || number > 999) {
+outputDiv.textContent = "Number out of range. Please enter a number between 0
+and 999.";
+return;
+}
+const singleDigits = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+"Nine"];
+const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+"Seventeen", "Eighteen", "Nineteen"];
+const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty",
+"Ninety"];
+let words = "";
+if (number === 0) {
+words = "Zero";
+} else {
+if (Math.floor(number / 100) > 0) {
+words += singleDigits[Math.floor(number / 100)] + " Hundred ";
+}
+const remainder = number % 100;
+if (remainder >= 10 && remainder < 20) {
+words += teens[remainder - 10];
+} else {
+if (Math.floor(remainder / 10) > 0) {
+words += tens[Math.floor(remainder / 10)] + " ";
+}
+if (remainder % 10 > 0) {
+words += singleDigits[remainder % 10];
+}
+}
+}
+outputDiv.textContent = "In words: " + words.trim();
+}
+</script>
+</body>
+</html>
+
+31. Write a program to encrypt the given number to display the encrypted data using Java Script
+<!DOCTYPE html>
+<html>
+<head>
+<title>Encrypt Number</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding-top: 50px;">
+<h2>Encrypt a 4-digit Number</h2>
+<input type="text" id="inputNumber" maxlength="4" placeholder="Enter 4-digit number">
+<button onclick="encrypt()">Encrypt</button>
+<h3 id="result"></h3>
+<script>
+function encrypt() {
+let num = document.getElementById("inputNumber").value;
+if (num.length !== 4 || isNaN(num)) {
+alert("Please enter a valid 4-digit number");
+return;
+}
+let digits = num.split('').map(Number);
+for (let i = 0; i < 4; i++) {
+digits[i] = (digits[i] + 7) % 10;
+}
+// Step 2: Swap 1st and 3rd, 2nd and 4th
+[digits[0], digits[2]] = [digits[2], digits[0]];
+[digits[1], digits[3]] = [digits[3], digits[1]];
+let encrypted = digits.join('');
+document.getElementById("result").innerText = "Encrypted Number: " + encrypted;
+}
+</script>
+</body>
+</html>
+
+32. To design a basic calculator using javascript.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Calculator</title>
+<style>
+body {
+font-family: 'Arial', sans-serif;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+margin: 0;
+background-color: #f4f4f4;
+}
+.calculator {
+background: white;
+border: 2px solid #ccc;
+border-radius: 8px;
+padding: 20px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.calculator input[type='text'] {
+width: 100%;
+height: 50px;
+margin-bottom: 10px;
+text-align: right;
+font-size: 24px;
+border: 1px solid #ccc;
+border-radius: 4px;
+padding: 10px;
+background-color: #f9f9f9;
+}
+.buttons {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+grid-gap: 10px;
+}
+.buttons button {
+height: 50px;
+font-size: 18px;
+border: none;
+border-radius: 4px;
+background: #007bff;
+color: white;
+cursor: pointer;
+transition: background 0.3s;
+}
+.buttons button:hover {
+background: #0056b3;
+}
+.buttons button.clear {
+background: #dc3545;
+}
+.buttons button.clear:hover {
+background: #a71d2a;
+}
+</style>
+</head>
+<body>
+<div class="calculator">
+<input type="text" id="result" disabled placeholder="0">
+<div class="buttons">
+<button onclick="clearResult()" class="clear">C</button>
+<button onclick="appendValue('(')">(</button>
+<button onclick="appendValue(')')">)</button>
+<button onclick="appendValue('/')">/</button>
+<button onclick="appendValue('7')">7</button>
+<button onclick="appendValue('8')">8</button>
+<button onclick="appendValue('9')">9</button>
+<button onclick="appendValue('')"></button>
+<button onclick="appendValue('4')">4</button>
+<button onclick="appendValue('5')">5</button>
+<button onclick="appendValue('6')">6</button>
+<button onclick="appendValue('-')">-</button>
+<button onclick="appendValue('1')">1</button>
+<button onclick="appendValue('2')">2</button>
+<button onclick="appendValue('3')">3</button>
+<button onclick="appendValue('+')">+</button>
+<button onclick="appendValue('0')">0</button>
+<button onclick="appendValue('.')">.</button>
+<button onclick="calculateResult()">=</button>
+</div>
+</div>
+<script>
+const resultField = document.getElementById('result');
+function appendValue(value) {
+if (resultField.value === '0' && !isNaN(value)) {
+resultField.value = value;
+} else {
+resultField.value += value;
+}
+}
+function clearResult() {
+resultField.value = "";
+}
+function calculateResult() {
+try {
+resultField.value = eval(resultField.value);
+} catch (error) {
+resultField.value = "Error";
+}
+}
+</script>
+</body>
+</html>
+
+33. Write JavaScript to validate the following fields of the Registration page.
+a. First Name (Name should contains alphabets and the length should not be less than 6 characters).
+b. Password (Password should not be less than 6 characters length).
+c. E-mail id (should not contain any invalid and must follow the standard pattern name@domain.com)
+d. Mobile Number (Phone number should contain 10 digits only).
+e. Last Name and Address (should not be Empty).
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registration Page Validation</title>
+<script src="validation.js" defer></script>
+</head>
+<body>
+<h2>Registration Form</h2>
+<form id="registration-form">
+<label for="first-name">First Name:</label>
+<input type="text" id="first-name" name="first-name" required>
+<br><br>
+<label for="last-name">Last Name:</label>
+<input type="text" id="last-name" name="last-name" required>
+<br><br>
+<label for="password">Password:</label>
+<input type="password" id="password" name="password" required>
+<br><br>
+<label for="email">E-mail:</label>
+<input type="email" id="email" name="email" required>
+<br><br>
+<label for="mobile">Mobile Number:</label>
+<input type="text" id="mobile" name="mobile" required>
+<br><br>
+<label for="address">Address:</label>
+<textarea id="address" name="address" required></textarea>
+<br><br>
+<button type="submit">Submit</button>
+</form>
+</body>
+</html>
+Validate.js
+document.getElementById("registration-form").addEventListener("submit", function (event) {
+let isValid = true;
+const firstName = document.getElementById("first-name").value.trim();
+if (firstName.length < 6 || !/^[A-Za-z]+$/.test(firstName)) {
+alert("First Name must contain only alphabets and be at least 6 characters long.");
+isValid = false;
+}
+const lastName = document.getElementById("last-name").value.trim();
+if (lastName === "") {
+alert("Last Name cannot be empty.");
+isValid = false;
+}
+const password = document.getElementById("password").value.trim();
+if (password.length < 6) {
+alert("Password must be at least 6 characters long.");
+isValid = false;
+}
+const email = document.getElementById("email").value.trim();
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+if (!emailRegex.test(email)) {
+alert("Please enter a valid email address (e.g., name@domain.com).");
+isValid = false;
+}
+const mobile = document.getElementById("mobile").value.trim();
+if (!/^\d{10}$/.test(mobile)) {
+alert("Mobile Number must contain exactly 10 digits.");
+isValid = false;
+}
+const address = document.getElementById("address").value.trim();
+if (address === "") {
+alert("Address cannot be empty.");
+isValid = false;
+}
+if (!isValid) {
+event.preventDefault();
+}
+});
+
+34. Develop HTML5 form with client validations using Java Script
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Registration Form with Validation</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 40px;
+}
+form {
+width: 300px;
+padding: 20px;
+border: 1px solid #ccc;
+border-radius: 8px;
+}
+label, input {
+display: block;
+width: 100%;
+margin-bottom: 10px;
+}
+input[type="submit"] {
+background-color: #28a745;
+color: white;
+border: none;
+padding: 10px;
+cursor: pointer;
+border-radius: 5px;
+}
+.error {
+color: red;
+font-size: 14px;
+}
+</style>
+</head>
+<body>
+<h2>Registration Form</h2>
+<form id="regForm" onsubmit="return validateForm()">
+<label>Name:</label>
+<input type="text" id="name" required>
+<label>Email:</label>
+<input type="email" id="email" required>
+<label>Age:</label>
+<input type="number" id="age" required>
+<label>Password:</label>
+<input type="password" id="password" required>
+<input type="submit" value="Register">
+<p id="errorMsg" class="error"></p>
+</form>
+<script>
+function validateForm() {
+const name = document.getElementById("name").value.trim();
+const email = document.getElementById("email").value.trim();
+const age = parseInt(document.getElementById("age").value);
+const password = document.getElementById("password").value;
+const errorMsg = document.getElementById("errorMsg");
+errorMsg.textContent = "";
+if (name === "" || email === "" || isNaN(age) || password === "") {
+errorMsg.textContent = "All fields are required.";
+return false;
+}
+if (age < 18) {
+errorMsg.textContent = "You must be at least 18 years old.";
+return false;
+}
+const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+if (!emailRegex.test(email)) {
+errorMsg.textContent = "Enter a valid email address.";
+return false;
+}
+if (password.length < 6) {
+errorMsg.textContent = "Password must be at least 6 characters long.";
+return false;
+}
+alert("Form submitted successfully!");
+return true;
+}
+</script>
+</body>
+</html>
+
+35. Write a Python program which generates an output file based on one-line instructions in an input file
+# program.py
+def process_instruction(line):
+parts = line.strip().split()
+if not parts:
+return "Invalid instruction"
+command = parts[0].upper()
+try:
+if command == "ADD":
+return f"Result: {int(parts[1]) + int(parts[2])}"
+elif command == "SUBTRACT":
+return f"Result: {int(parts[1]) - int(parts[2])}"
+elif command == "MULTIPLY":
+return f"Result: {int(parts[1]) * int(parts[2])}"
+elif command == "DIVIDE":
+return f"Result: {int(parts[1]) / int(parts[2])}"
+elif command == "REVERSE":
+return f"Result: {parts[1][::-1]}"
+elif command == "UPPERCASE":
+return f"Result: {parts[1].upper()}"
+else:
+return "Unknown command"
+except (IndexError, ValueError, ZeroDivisionError) as e:
+return f"Error: {str(e)}"
+def main():
+input_file = "input.txt"
+output_file = "output.txt"
+with open(input_file, "r") as infile, open(output_file, "w") as outfile:
+for line in infile:
+result = process_instruction(line)
+outfile.write(result + "\n")
+print(f"Instructions processed. Results saved to '{output_file}'.")
+if __name__ == "__main__":
+main()
+input.txt
+ADD 10 20
+SUBTRACT 50 15
+MULTIPLY 6 7
+DIVIDE 9 3
+REVERSE Python
+UPPERCASE openai
+
+36. Write a program to illustrate XML and XSLT
+Cars.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<stock>
+<new-car>
+<model>Fiat Panda</model>
+<price>12000</price>
+</new-car>
+<used-car>
+<model>Fiat Bravo</model>
+<price>4000</price>
+<mileage>1000</mileage>
+<condition>Good</condition>
+</used-car>
+<used-car>
+<model>Ferrari</model>
+<price>400000</price>
+<mileage>100</mileage>
+<condition>Excellent</condition>
+</used-car>
+</stock>
+Cars.xsl
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:template match="/">
+<html>
+<head>
+<title>Car Stock</title>
+<style>
+table {
+width: 50%;
+border-collapse: collapse;
+margin: 20px 0;
+}
+table, th, td {
+border: 1px solid black;
+}
+th, td {
+padding: 8px;
+text-align: left;
+}
+th {
+background-color: #f2f2f2;
+}
+</style>
+</head>
+<body>
+<h2>Car Stock Information</h2>
+<table>
+<tr>
+<th>Type</th>
+<th>Model</th>
+<th>Price</th>
+<th>Mileage</th>
+<th>Condition</th>
+</tr>
+<xsl:for-each select="stock/new-car">
+<tr>
+<td>New Car</td>
+<td><xsl:value-of select="model"/></td>
+<td><xsl:value-of select="price"/></td>
+<td>N/A</td>
+<td>N/A</td>
+</tr>
+</xsl:for-each>
+<xsl:for-each select="stock/used-car">
+<tr>
+<td>Used Car</td>
+<td><xsl:value-of select="model"/></td>
+<td><xsl:value-of select="price"/></td>
+<td><xsl:value-of select="mileage"/></td>
+<td><xsl:value-of select="condition"/></td>
+</tr>
+</xsl:for-each>
+</table>
+</body>
+</html>
+</xsl:template>
+</xsl:stylesheet>
+Display.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Car Stock</title>
+</head>
+<body>
+<h1>Car Stock Information</h1>
+<div id="content"></div>
+<script>
+const xmlUrl = 'cars.xml';
+const xslUrl = 'cars.xsl';
+async function loadAndTransform() {
+const parser = new DOMParser();
+const [xmlRes, xslRes] = await Promise.all([fetch(xmlUrl), fetch(xslUrl)]);
+const xmlDoc = parser.parseFromString(await xmlRes.text(), 'text/xml');
+const xslDoc = parser.parseFromString(await xslRes.text(), 'text/xml');
+}
+if (window.ActiveXObject || 'ActiveXObject' in window) {
+const ex = new ActiveXObject('MSXML2.DOMDocument');
+ex.load(xslDoc);
+const output = xmlDoc.transformNode(xslDoc);
+document.getElementById('content').innerHTML = output;
+} else if (document.implementation && document.implementation.createDocument) {
+const xsltProcessor = new XSLTProcessor();
+xsltProcessor.importStylesheet(xslDoc);
+const resultDocument = xsltProcessor.transformToFragment(xmlDoc, document);
+document.getElementById('content').appendChild(resultDocument);
+} else {
+console.log('Your browser does not support XSLT processing.');
+}
+loadAndTransform();
+</script>
+</body>
+</html>
+
+37. Create and save an XML document at the server, which contains 10 users information. Write a program which takes User Id as input and returns the user details by taking the user information from the XML document.
+Create XML File — users.xml
+<?xml version="1.0"?>
+<users>
+<user id="U001">
+<name>John Doe</name>
+<email>john@example.com</email>
+<age>28</age>
+</user>
+<user id="U002">
+<name>Jane Smith</name>
+<email>jane@example.com</email>
+<age>24</age>
+</user>
+<user id="U003">
+<name>Mike Johnson</name>
+<email>mike@example.com</email>
+<age>30</age>
+</user>
+<user id="U004">
+<name>Emily Davis</name>
+<email>emily@example.com</email>
+<age>26</age>
+</user>
+<user id="U005">
+<name>David Wilson</name>
+<email>david@example.com</email>
+<age>32</age>
+</user>
+<user id="U006">
+<name>Sophia Brown</name>
+<email>sophia@example.com</email>
+<age>29</age>
+</user>
+<user id="U007">
+<name>Chris Green</name>
+<email>chris@example.com</email>
+<age>31</age>
+</user>
+<user id="U008">
+<name>Olivia Hall</name>
+<email>olivia@example.com</email>
+<age>27</age>
+</user>
+<user id="U009">
+<name>Daniel King</name>
+<email>daniel@example.com</email>
+<age>33</age>
+</user>
+<user id="U010">
+<name>Grace Lee</name>
+<email>grace@example.com</email>
+<age>25</age>
+</user>
+</users>
+Python Program to Query User — user_query.py
+import xml.etree.ElementTree as ET
+def get_user_details(user_id):
+try:
+tree = ET.parse("users.xml")
+root = tree.getroot()
+for user in root.findall('user'):
+if user.attrib.get('id') == user_id:
+name = user.find('name').text
+email = user.find('email').text
+age = user.find('age').text
+return f"User ID: {user_id}\nName: {name}\nEmail: {email}\nAge: {age}"
+return f"No user found with ID: {user_id}"
+except Exception as e:
+return f"Error reading XML: {e}"
+if __name__ == "__main__":
+user_input = input("Enter User ID (e.g., U003): ").strip()
+print(get_user_details(user_input))
+
+38. Create an XML files with book-cover catalog and store the titles of the books in a title attribute of each cover node. Modify the example so that every time the mouse hovers over an image, the book's title is displayed below the image.
+Create a file named book-catalog.xml:
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<cover title="To Kill a Mockingbird" />
+<cover title="1984" />
+<cover title="Pride and Prejudice" />
+<cover title="The Great Gatsby" />
+<cover title="Harry Potter and the Sorcerer's Stone" />
+<cover title="The Catcher in the Rye" />
+<cover title="Lord of the Flies" />
+<cover title="Jane Eyre" />
+</catalog>
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Book Cover Catalog (From XML)</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 20px;
+background-color: #f5f5f5;
+}
+h1 {
+text-align: center;
+margin-bottom: 30px;
+}
+.catalog {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 20px;
+max-width: 1200px;
+margin: 0 auto;
+}
+.book-item {
+background: white;
+border-radius: 8px;
+padding: 15px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+text-align: center;
+}
+.book-cover {
+width: 120px;
+height: 180px;
+background: linear-gradient(135deg, #667eea, #764ba2);
+border-radius: 4px;
+margin: 0 auto 15px;
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: bold;
+cursor: pointer;
+}
+.book-title {
+font-size: 14px;
+color: #333;
+min-height: 20px;
+opacity: 0;
+transition: opacity 0.3s;
+}
+.book-title.visible {
+opacity: 1;
+}
+</style>
+</head>
+<body>
+<h1>Book Cover Catalog</h1>
+<div class="catalog" id="catalog"></div>
+<script>
+// Load XML file using AJAX
+function loadBookCatalog() {
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "book-catalog.xml", true);
+xhr.onload = function () {
+if (xhr.status === 200) {
+var xml = xhr.responseXML;
+var covers = xml.getElementsByTagName("cover");
+var catalog = document.getElementById("catalog");
+for (var i = 0; i < covers.length; i++) {
+var title = covers[i].getAttribute("title");
+var item = document.createElement("div");
+item.className = "book-item";
+var cover = document.createElement("div");
+cover.className = "book-cover";
+cover.textContent = "COVER";
+var titleDiv = document.createElement("div");
+titleDiv.className = "book-title";
+cover.addEventListener("mouseenter", function(t = titleDiv, txt = title) {
+return () => {
+t.textContent = txt;
+t.classList.add("visible");
+};
+}());
+cover.addEventListener("mouseleave", function(t = titleDiv) {
+return () => {
+t.classList.remove("visible");
+setTimeout(() => {
+if (!t.classList.contains("visible")) {
+t.textContent = "";
+}
+}, 300);
+};
+}());
+item.appendChild(cover);
+item.appendChild(titleDiv);
+catalog.appendChild(item);
+}
+} else {
+console.error("Failed to load XML.");
+}
+};
+xhr.send();
+}
+// Run on page load
+document.addEventListener("DOMContentLoaded", loadBookCatalog);
+</script>
+</body>
+</html>
+
+39. Write a program on "raw" AJAX implementation using the XMLHttpRequest object to fetch and display data from an XML file.
+data.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+<book>
+<title>The Alchemist</title>
+<author>Paulo Coelho</author>
+</book>
+<book>
+<title>Harry Potter</title>
+<author>J.K. Rowling</author>
+</book>
+</books>
+index.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>AJAX XML Data Fetch</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+.book { margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+<h2>Books from XML</h2>
+<button onclick="loadXMLData()">Load Books</button>
+<div id="output"></div>
+<script>
+function loadXMLData() {
+// Create an XMLHttpRequest object
+var xhr = new XMLHttpRequest();
+// Define the request
+xhr.open("GET", "data.xml", true);
+// When the request is complete
+xhr.onload = function() {
+if (xhr.status === 200) {
+var xml = xhr.responseXML;
+var books = xml.getElementsByTagName("book");
+var output = "";
+for (var i = 0; i < books.length; i++) {
+var title = books[i].getElementsByTagName("title")[0].textContent;
+var author = books[i].getElementsByTagName("author")[0].textContent;
+output += "<div class='book'><strong>" + title + "</strong><br>by " + author +
+"</div>";
+}
+document.getElementById("output").innerHTML = output;
+} else {
+document.getElementById("output").innerHTML = "Error fetching data.";
+}
+};
+// Send the request
+xhr.send();
+}
+</script>
+</body>
+</html>
+
+40. XML document processing using SAX and DOM
+Users.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+<user>
+<id>1</id>
+<name>John Doe</name>
+<email>john.doe@example.com</email>
+<phone>1234567890</phone>
+<address>123 Main St, Cityville</address>
+</user>
+<user>
+<id>2</id>
+<name>Jane Smith</name>
+<email>jane.smith@example.com</email>
+<phone>9876543210</phone>
+<address>456 Maple Ave, Townsville</address>
+</user>
+<user>
+<id>3</id>
+<name>Robert Johnson</name>
+<email>robert.j@example.com</email>
+<phone>1122334455</phone>
+<address>789 Oak Dr, Hamlet</address>
+</user>
+<user>
+<id>4</id>
+<name>Emily Davis</name>
+<email>emily.d@example.com</email>
+<phone>2233445566</phone>
+<address>321 Pine Rd, Metropolis</address>
+</user>
+<user>
+<id>5</id>
+<name>Michael Brown</name>
+<email>michael.b@example.com</email>
+<phone>3344556677</phone>
+<address>654 Birch Ln, Springfield</address>
+</user>
+<user>
+<id>6</id>
+<name>Linda Wilson</name>
+<email>linda.w@example.com</email>
+<phone>4455667788</phone>
+<address>987 Cedar St, Rivertown</address>
+</user>
+<user>
+<id>7</id>
+<name>David Martinez</name>
+<email>david.m@example.com</email>
+<phone>5566778899</phone>
+<address>123 Walnut Blvd, Lakeside</address>
+</user>
+<user>
+<id>8</id>
+<name>Sarah Taylor</name>
+<email>sarah.t@example.com</email>
+<phone>6677889900</phone>
+<address>456 Chestnut Ct, Hilltop</address>
+</user>
+<user>
+<id>9</id>
+<name>Daniel White</name>
+<email>daniel.w@example.com</email>
+<phone>7788990011</phone>
+<address>789 Redwood Pl, Valleyview</address>
+</user>
+<user>
+<id>10</id>
+<name>Olivia Harris</name>
+<email>olivia.h@example.com</email>
+<phone>8899001122</phone>
+<address>321 Willow Ln, Bayside</address>
+</user>
+</users>
+Login.java
+import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import java.io.File;
+import java.util.Scanner;
+public class UserDetails {
+public static void main(String[] args) {
+try {
+File xmlFile = new File("users.xml");
+DocumentBuilderFactory factory =
+DocumentBuilderFactory.newInstance();
+DocumentBuilder builder = factory.newDocumentBuilder();
+Document document = builder.parse(xmlFile);
+document.getDocumentElement().normalize();
+NodeList userList = document.getElementsByTagName("user");
+Scanner scanner = new Scanner(System.in);
+System.out.print("Enter User ID to fetch details: ");
+String userId = scanner.nextLine();
+boolean userFound = false;
+for (int i = 0; i < userList.getLength(); i++) {
+Node userNode = userList.item(i);
+if (userNode.getNodeType() == Node.ELEMENT_NODE) {
+Element userElement = (Element) userNode;
+String id =
+userElement.getElementsByTagName("id").item(0).getTextContent();
+if (id.equals(userId)) {
+System.out.println("User Details:");
+System.out.println("ID: " + id);
+System.out.println("Name: " +
+userElement.getElementsByTagName("name").item(0).getTextContent());
+System.out.println("Email: " +
+userElement.getElementsByTagName("email").item(0).getTextContent());
+System.out.println("Phone: " +
+userElement.getElementsByTagName("phone").item(0).getTextContent());
+System.out.println("Address: " +
+userElement.getElementsByTagName("address").item(0).getTextContent());
+userFound = true;
+break;
+}
+}
+}
+if (!userFound) {
+System.out.println("User with ID " + userId + " not
+found.");
+}
+} catch (Exception e) {
+e.printStackTrace();
+}
+}
+}
+
+41. Program on steps to install llS web server.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Welcome to IIS</title>
+<style>
+body {
+background-color: #f0f8ff;
+font-family: Arial, sans-serif;
+text-align: center;
+padding: 50px;
+}
+h1 {
+color: #0078d7;
+}
+p {
+font-size: 18px;
+color: #333;
+}
+.box {
+border: 2px dashed #0078d7;
+padding: 20px;
+margin-top: 30px;
+background-color: #ffffff;
+display: inline-block;
+}
+</style>
+</head>
+<body>
+<h1> IIS Web Server is Working!</h1>
+<div class="box">
+<p>This HTML page is served using <strong>Microsoft IIS</strong>.</p>
+<p>If you're seeing this, your IIS setup is successful </p>
+</div>
+</body>
+</html>
+
+42. Installing a Personal Web Server (PWS) typically involves setting up a webserver environment on your local machine. Here's a' step-by-step guide to installing PWS:
+Step 1: Download XAMPP
+Go to: https://www.apachefriends.org/index.html Download the installer for Windows.
+Step 2: Install XAMPP
+Double-click the .exe file and follow the setup wizard.
+Step 3: Start Apache and MySQL
+Open XAMPP Control Panel and click:
+● Start next to Apache
+● Start next to MySQL
+Step 4: Place your files
+Put your .html or .php files in:
+C:\xampp\htdocs\
+Step 5: Open browser
+Visit:
+http://localhost
+or for a project folder:
+http://localhost/yourfolder
+2. For Linux (Ubuntu): Using LAMP Stack
+Step 1: Update system
+sudo apt update
+sudo apt upgrade
+Step 2: Install Apache
+sudo apt install apache2
+Step 3: Install MySQL (if needed)
+sudo apt install mysql-server
+Step 4: Install PHP
+sudo apt install php libapache2-mod-php php-mysql
+Step 5: Restart Apache
+sudo systemctl restart apache2
+Step 6: Test Apache
+Open browser:
+http://localhost
+Step 7: Create a test file
+echo "<?php phpinfo(); ?>" |
+sudo tee /var/www/html/info.php
+Visit: http://localhost/info.php
+
+43. Write a console application that obtains four integer values from the user and displays the product using ASP.NET
+using System;
+namespace ProductCalculator
+{
+class Program
+{
+static void Main(string[] args)
+{
+int[] numbers = new int[4];
+int product = 1;
+Console.WriteLine("Enter four integer values:");
+for (int i = 0; i < 4; i++)
+{
+Console.Write("Enter number {0}: ", i + 1);
+string input = Console.ReadLine();
+// Input validation
+while (!int.TryParse(input, out numbers[i]))
+{
+Console.Write("Invalid input. Enter an integer for number {0}: ", i + 1);
+input = Console.ReadLine();
+}
+product *= numbers[i];
+}
+}
+}
+}
+Console.WriteLine("The product of the entered numbers is: " + product);
+
+44. Develop a simple Java Servlet application
+SimpleServletApp/
+├── WEB-INF/
+│ ├── web.xml
+│ └── classes/
+│ └── HelloServlet.class
+I. HelloServlet.java
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+public class HelloServlet extends HttpServlet {
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+response.setContentType("text/html");
+PrintWriter out = response.getWriter();
+out.println("<h2>Hello from Servlet!</h2>");
+}
+}
+II. web.xml
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+version="3.0">
+<servlet>
+<servlet-name>HelloServlet</servlet-name>
+<servlet-class>HelloServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>HelloServlet</servlet-name>
+<url-pattern>/hello</url-pattern>
+</servlet-mapping>
+</web-app>
+III. Compile
+javac -classpath "path_to_tomcat/lib/servlet-api.jar" HelloServlet.java
+IV. Run in tomcat
+http://localhost:8080/SimpleServletApp/hello
+
+45. Develop a Java Servlet application with session tracking
+SessionApp/
+├── WEB-INF/
+│ ├── web.xml
+│ └── classes/
+│ └── VisitCounterServlet.class
+VisitCounterServlet.java
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+public class VisitCounterServlet extends HttpServlet {
+public void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+response.setContentType("text/html");
+PrintWriter out = response.getWriter();
+HttpSession session = request.getSession();
+Integer visitCount = (Integer) session.getAttribute("visitCount");
+if (visitCount == null) {
+visitCount = 1;
+out.println("<h2>Welcome, new visitor!</h2>");
+} else {
+visitCount++;
+out.println("<h2>Welcome back! Visit count: " + visitCount + "</h2>");
+}
+session.setAttribute("visitCount", visitCount);
+}
+}
+Web.xml
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="3.1">
+<servlet>
+<servlet-name>VisitCounterServlet</servlet-name>
+<servlet-class>VisitCounterServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>VisitCounterServlet</servlet-name>
+<url-pattern>/visit</url-pattern>
+</servlet-mapping>
+</web-app>
+
+46. Develop a simple JSP application
+index.jsp – Input Form
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple JSP App</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding-top: 100px;">
+<h2>Welcome to My JSP App</h2>
+<form action="welcome.jsp" method="post">
+Enter your name: <input type="text" name="username" required>
+<br><br>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>
+welcome.jsp – Display Output
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+String name = request.getParameter("username");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding-top: 100px;">
+<h2>Hello, <%= name %>!</h2>
+<p>Welcome to this simple JSP application.</p>
+</body>
+</html>
+
+47. Creation of an application to have access from a database using JDBC
+Create Database and Table
+Run this in MySQL:
+CREATE DATABASE testdb;
+USE testdb;
+CREATE TABLE users (
+id INT PRIMARY KEY,
+name VARCHAR(100),
+email VARCHAR(100)
 );
-END LOOP;
-IF emp_count > 0 THEN
-avg_salary := total_salary / emp_count;
-END IF;
-DBMS_OUTPUT.PUT_LINE('Total Salary: ' || total_salary);
-DBMS_OUTPUT.PUT_LINE('Average Salary: ' || avg_salary);
-DBMS_OUTPUT.PUT_LINE('Number of Employees: ' || emp_count);
-END;
-/
-2. Write a program to accept a range of salary (that is lower boundary and higher boundary)
-and print the details of emps along with loc,grade and exp
-SET SERVEROUTPUT ON;
-DECLARE
-CURSOR salary_cursor (low_sal NUMBER, high_sal NUMBER) IS
-SELECT e.empno, e.ename, e.sal, d.loc, g.grade
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-JOIN salgrade g ON e.sal BETWEEN g.losal AND g.hisal
-WHERE e.sal BETWEEN low_sal AND high_sal;
-BEGIN
-FOR emp_rec IN salary_cursor(2000, 5000) LOOP
-DBMS_OUTPUT.PUT_LINE(
-'Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Salary: ' || emp_rec.sal ||
-', Location: ' || emp_rec.loc ||
-', Grade: ' || emp_rec.grade ||
+INSERT INTO users VALUES
+(1, 'John Doe', 'john@example.com'),
+(2, 'Jane Smith', 'jane@example.com');
+Java Program to Access the Database
+Create a file named JDBCExample.java:
+import java.sql.*;
+public class JDBCExample {
+public static void main(String[] args) {
+String url = "jdbc:mysql://localhost:3306/testdb";
+String user = "root"; // your DB username
+String password = ""; // your DB password
+try {
+// Load MySQL JDBC driver
+Class.forName("com.mysql.cj.jdbc.Driver");
+// Connect to database
+Connection conn = DriverManager.getConnection(url, user, password);
+// Create statement and execute query
+Statement stmt = conn.createStatement();
+ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+while (rs.next()) {
+System.out.println("ID: " + rs.getInt("id"));
+System.out.println("Name: " + rs.getString("name"));
+System.out.println("Email: " + rs.getString("email"));
+System.out.println("---------------------------");
+}
+rs.close();
+stmt.close();
+conn.close();
+} catch (Exception e) {
+System.out.println("Error: " + e.getMessage());
+}
+}
+}
+
+48. Develop a full-fledged web application with database access spreading over to 3 sessions
+SESSION 1: Setup and Insert Student Data
+MySQL Table
+CREATE DATABASE studentdb;
+USE studentdb;
+CREATE TABLE students (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(100),
+email VARCHAR(100),
+course VARCHAR(100)
 );
-END LOOP;
-END;
-/
-1. Write a database trigger halt the transaction on Sunday on EMP table
-CREATE OR REPLACE TRIGGER halt_transaction_on_sunday
-BEFORE INSERT OR UPDATE OR DELETE ON emp
-BEGIN
-IF TO_CHAR(SYSDATE, 'DY') = 'SUN' THEN
-RAISE_APPLICATION_ERROR(-20001, 'Transactions are not allowed on
-Sundays');
-ENDEND;
-/
-IF;
-2. Write a database trigger halt the transaction of USER SCOTT on table EMP
-CREATE OR REPLACE TRIGGER halt_transaction_for_scott
-BEFORE INSERT OR UPDATE OR DELETE ON emp
-BEGIN
-IF USER = 'SCOTT' THEN
-RAISE_APPLICATION_ERROR(-20001,
-'User SCOTT is not allowed to perform DML on the EMP table');
-END IF;
-END;
-1. List the employees working in research department.
-​
- SELECT e.empno, e.ename, e.job, e.sal
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE d.dname = 'RESEARCH';
-2. List employees who are located in New York and Chicago.
-​
- SELECT e.empno, e.ename, e.job, e.sal, d.loc
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE d.loc IN ('NEW YORK', 'CHICAGO');
-3. Display the department name in which ANALYSTS are working
-​
- SELECT DISTINCT d.dname
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE e.job = 'ANALYST';
-1. Create table empl and copy the emp table for deptno 10 while creating the table
-CREATE TABLE empl AS
-SELECT *
-FROM emp
-WHERE deptno = 10;
-2. Insert new record in emp1 table, Merge the emp1 table on emp table.
-INSERT INTO emp1 (empno, ename, job, mgr, hiredate, sal, comm, deptno)
-VALUES (9999, 'NEW_EMP', 'CLERK', 7839, SYSDATE, 3000, NULL, 10);
-MERGE INTO emp e
-USING emp1 e1
-ON (e.empno = e1.empno)
-WHEN NOT MATCHED THEN
-INSERT (empno, ename, job, mgr, hiredate, sal, comm, deptno)
-VALUES (e1.empno, e1.ename, e1.job, e1.mgr, e1.hiredate, e1.sal, e1.comm, e1.deptno);
-/
-3. Create table emp2 with same structure of emp table. Do not copy the data
-CREATE TABLE emp2 AS
-SELECT *
-FROM emp
-WHERE 1 = 0;
-SET - 7
-1.​ Display all the records in EMP table
-SELECT * FROM emp;
-2.​ Display all employees who do not have any reportees
-SELECT empno, ename, job
-FROM emp
-WHERE empno NOT IN (SELECT mgr FROM emp WHERE mgr IS NOT NULL);
-3.​ Write a program accepted string and check whether it is palindrome or not.
-SET SERVEROUTPUT ON;
-DECLARE
-v_str VARCHAR2(50) := '&Enter_String';
-v_rev VARCHAR2(50) := '';
-BEGIN
--- Reverse the string
-FOR i IN REVERSE 1 .. LENGTH(v_str) LOOP
-v_rev := v_rev || SUBSTR(v_str, i, 1);
-END LOOP;
--- Compare
-IF LOWER(v_str) = LOWER(v_rev) THEN
-DBMS_OUTPUT.PUT_LINE(v_str || ' is a palindrome.');
-ELSE
-DBMS_OUTPUT.PUT_LINE(v_str || ' is NOT a palindrome.');
-END IF;
-END;
-/
-4.​ TRIGGERS IN WRITE A database Trigger hacked the transaction of emp table if the
-depart number is does not exist in the dept table
-CREATE OR REPLACE TRIGGER check_dept_exists
-BEFORE INSERT OR UPDATE ON emp
-FOR EACH ROW
-DECLARE
-v_count NUMBER;
-BEGIN
--- Check whether dept number exists
-SELECT COUNT(*) INTO v_count
-FROM dept
-WHERE deptno = :NEW.deptno;
-IF v_count = 0 THEN
-RAISE_APPLICATION_ERROR(-20050,
-'Department number does not exist in DEPT table.');
-END IF;
-END;
-/
-SET - 9
-1.​ Write a database trigger to halt the transaction of USER SCOTT on table EMP.
-CREATE OR REPLACE TRIGGER halt_scott_transaction
-BEFORE INSERT OR UPDATE OR DELETE ON emp
-FOR EACH ROW
-BEGIN
-IF USER = 'SCOTT' THEN
-RAISE_APPLICATION_ERROR(-20010,
-'User SCOTT is not allowed to perform transactions on EMP table.');
-END IF;
-END;
-/
-2.​ Write a database trigger to halt the transaction between the time 6pm to 10pm on
-table EMP.
-CREATE OR REPLACE TRIGGER halt_transaction_time
-BEFORE INSERT OR UPDATE OR DELETE ON emp
-FOR EACH ROW
-BEGIN
-IF TO_NUMBER(TO_CHAR(SYSDATE, 'HH24')) BETWEEN 18 AND 22 THEN
-RAISE_APPLICATION_ERROR(-20002,
-'Transaction halted: Transactions on EMP table are not allowed between 6
-PM to 10 PM.'
-);
-END IF;
-END;
-/
-1.​ Write a procedure to accept the deptno as parameter and display the details of that
-dept. Also display the total salary, no of employees, max sal and avg sal?
-CREATE OR REPLACE PROCEDURE display_dept_details(p_deptno IN
-emp.deptno%TYPE) IS
-v_total_sal NUMBER;
-v_num_emps NUMBER;
-v_max_sal NUMBER;
-v_avg_sal NUMBER;
-CURSOR dept_cursor IS
-SELECT SUM(sal), COUNT(*), MAX(sal), AVG(sal)
-FROM emp
-WHERE deptno = p_deptno;
-BEGIN
-OPEN dept_cursor;
-FETCH dept_cursor INTO v_total_sal, v_num_emps, v_max_sal, v_avg_sal;
-IF v_num_emps > 0 THEN
-DBMS_OUTPUT.PUT_LINE('Total Salary: ' || v_total_sal);
-DBMS_OUTPUT.PUT_LINE('Number of Employees: ' || v_num_emps);
-DBMS_OUTPUT.PUT_LINE('Max Salary: ' || v_max_sal);
-DBMS_OUTPUT.PUT_LINE('Average Salary: ' || ROUND(v_avg_sal,2));
-ELSE
-DBMS_OUTPUT.PUT_LINE('No employees found for deptno: ' || p_deptno);
-END IF;
-CLOSEEND;
-/
-dept_cursor;
-2.​ Write a program to accept empno and print all the details along with loc and grade.
-SET SERVEROUTPUT ON;
-DECLARE
-v_empno NUMBER := &Enter_Empno;
-CURSOR emp_cursor IS
-SELECT e.empno, e.ename, e.job, e.mgr, e.hiredate,
-e.sal, e.comm, e.deptno, d.dname, d.loc, g.grade
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-JOIN salgrade g ON e.sal BETWEEN g.losal AND g.hisal
-WHERE e.empno = v_empno;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Job: ' || emp_rec.job ||
-', Manager: ' || emp_rec.mgr ||
-', Hire Date: ' || TO_CHAR(emp_rec.hiredate, 'DD-MON-YYYY') ||
-', Salary: ' || emp_rec.sal ||
-', Commission: ' || NVL(emp_rec.comm, 0) ||
-', Dept No: ' || emp_rec.deptno ||
-', Dept Name: ' || emp_rec.dname ||
-', Location: ' || emp_rec.loc ||
-', Grade: ' || emp_rec.grade);
-END LOOP;
--- Optional: If no record found
-IF SQL%ROWCOUNT = 0 THEN
-DBMS_OUTPUT.PUT_LINE('No employee found with empno: ' || v_empno);
-END IF;
-END;
-/
-1.​ Display employees who are reporting to JONES.
-SELECT *
-FROM emp
-WHERE mgr = (SELECT empno FROM emp WHERE ename = 'JONES');
-2.​ Display all the employees who are reporting to Jones Manager.
-SELECT *
-FROM emp
-WHERE mgr = (SELECT empno FROM emp WHERE ename = 'JONES');
-3.​ Display all the managers in SALES and ACCOUNTING department.
-SELECT DISTINCT e.ename AS manager
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE d.dname IN ('SALES', 'ACCOUNTING')
-AND e.job = 'MANAGER';
-4.​ Display all the employee names in Research and Sales Department who are having
-at least 1 person reporting to them.
-SELECT DISTINCT m.ename
-FROM emp e
-JOIN emp m ON e.mgr = m.empno
-JOIN dept d ON m.deptno = d.deptno
-WHERE d.dname IN ('RESEARCH', 'SALES');
-1.​ Display all jobs that are in department 10. Include the location of department in the
-output.
-SELECT DISTINCT e.job, d.loc
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE e.deptno = 10;
-2.​ Write a query that displays the employee's names with the first letter capitalized and
-all other letters lowercase for all employees whose name starts with J, A, or M.
-SELECT INITCAP(ename) AS formatted_name
-FROM emp
-WHERE SUBSTR(ename, 1, 1) IN ('J', 'A', 'M');
-3.​ Display all the records in emp table where employee hired after 28-SEP-81 and
-before 03-DEC81.
-SELECT *
-FROM emp
-WHERE hiredate > TO_DATE('28-SEP-1981', 'DD-MON-YYYY')
-AND hiredate < TO_DATE('03-DEC-1981', 'DD-MON-YYYY');
-4.​ Write a query to display the employee name, department name of all employees who
-earn a commission.
-SELECT e.ename, d.dname
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-WHERE e.comm IS NOT NULL;
-1.​ Write a program to accept a deptno and display who are working in that dept?
-SET SERVEROUTPUT ON;
-DECLARE
-v_deptno NUMBER := &Enter_Deptno;
-CURSOR emp_cursor IS
-SELECT ename
-FROM emp
-WHERE deptno = v_deptno;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.ename);
-END LOOP;
-2.​ Write a program to display all the information of emp table.
-SET SERVEROUTPUT ON;
-DECLARE
-v_deptno NUMBER := &Enter_Deptno; -- Accept department number as input
-CURSOR emp_cursor IS
-SELECT ename
-FROM emp
-WHERE deptno = v_deptno;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_rec.ename);
-END LOOP;
--- Optional: if no employees found
-IF SQL%ROWCOUNT = 0 THEN
-DBMS_OUTPUT.PUT_LINE('No employees found in deptno: ' || v_deptno);
-END IF;
-END;
-/
-SET -10
-1) display all the employees who do not have any reportees
-SELECT ename
-FROM emp
-WHERE empno NOT IN (SELECT DISTINCT mgr FROM emp WHERE mgr IS NOT NULL);
-2) list employees who are having at least two reportings
-SELECT e.ename, COUNT(r.empno) AS reportees_count
-FROM emp e
-JOIN emp r ON r.mgr = e.empno
-GROUP BY e.ename
-HAVING COUNT(r.empno) >= 2;
-3) list the department names which are having more than 5 employees
-SELECT d.dname, COUNT(e.empno) AS emp_count
-FROM dept d
-JOIN emp e ON e.deptno = d.deptno
-GROUP BY d.dname
-HAVING COUNT(e.empno) > 5;
-4) list department name having at least three salesman
-SELECT d.dname, COUNT(e.empno) AS sales_count
-FROM dept d
-JOIN emp e ON e.deptno = d.deptno
-WHERE e.job = 'SALESMAN'
-GROUP BY d.dname
-HAVING COUNT(e.empno) >= 3;
-5) list employees from research and accounting having at least two reportings
-SELECT e.ename, COUNT(r.empno) AS reportees_count
-FROM emp e
-JOIN dept d ON e.deptno = d.deptno
-JOIN emp r ON r.mgr = e.empno
-WHERE d.dname IN ('RESEARCH', 'ACCOUNTING')
-GROUP BY e.ename
-HAVING COUNT(r.empno) >= 2;
-1) DISPLAY THE EMPNO, ENAME ,SAL AND SALARY INCREASED BY 15%
-​
- SELECT empno, ename, sal, sal * 1.15 AS increased_salary
-FROM emp;
-2) DISPLAY ENAME,SAL,GRADE USE EMP SAL GRADE TABLE
-​
- . SELECT e.ename, e.sal, g.grade
-​
- FROM emp e
-JOIN salgrade g ON e.sal BETWEEN g.losal AND g.hisal;
-3) DISPLAY ALL EMPLOYEES AND CORRESPONDING MANAGERS
-SELECT e.empno, e.ename, e.job, m.ename AS manager
-FROM emp e
-LEFT JOIN emp m ON e.mgr = m.empno;
-4) DISPLAY ALL THE DEPARTMENTS WHERE EMPLOYEES SALARY IS GREATER
-THAN AVERAGE SALARY OF THE DEPARTMENT
-SELECT e.deptno, e.ename, e.sal
-FROM emp e
-WHERE e.sal > (SELECT AVG(sal) FROM emp WHERE deptno = e.deptno);
-5) DISPLAY ALL EMPLOYEES WHO SALARY GREATER THAN THE MANAGER SALARY
-​
- SELECT e.empno, e.ename, e.sal
-FROM emp e
-WHERE e.sal > (SELECT sal FROM emp WHERE empno = e.mgr);
-1.​ WRITE A PROGRAM TO ACCEPT A YEAR AND DISPLAY THE EMPS BELONGS
-TO THAT YEAR
-SET SERVEROUTPUT ON;
-DECLARE
-v_year NUMBER := &Enter_Year; nput
-CURSOR emp_cursor IS
-SELECT empno, ename, hiredate
-FROM emp
-WHERE TO_CHAR(hiredate, 'YYYY') = v_year;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Hire Date: ' || TO_CHAR(emp_rec.hiredate, 'DD-MON-YYYY'));
-END LOOP;
-/
-END;
-2.​ WRITE A PROGRAM TO ACCEPT THE GRADE AND DISPLAY EMPS BELONGS
-TO THE GRADE
-SET SERVEROUTPUT ON;
-DECLARE
-v_grade NUMBER := &Enter_Grade;
-CURSOR emp_cursor IS
-SELECT e.empno, e.ename, e.sal, g.grade
-FROM emp e
-JOIN salgrade g ON e.sal BETWEEN g.losal AND g.hisal
-WHERE g.grade = v_grade;
-BEGIN
-FOR emp_rec IN emp_cursor LOOP
-DBMS_OUTPUT.PUT_LINE('Emp No: ' || emp_rec.empno ||
-', Name: ' || emp_rec.ename ||
-', Salary: ' || emp_rec.sal ||
-', Grade: ' || emp_rec.grade);
-END LOOP;
-/
-END;
+HTML Form (WebContent/index.html)
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Registration</title>
+</head>
+<body>
+<h2>Student Registration Form</h2>
+<form action="RegisterServlet" method="post">
+Name: <input type="text" name="name" required><br><br>
+Email: <input type="email" name="email" required><br><br>
+Course: <input type="text" name="course" required><br><br>
+<input type="submit" value="Register">
+</form>
+</body>
+</html>
+RegisterServlet.java
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.sql.*;
+public class RegisterServlet extends HttpServlet {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+String name = request.getParameter("name");
+String email = request.getParameter("email");
+String course = request.getParameter("course");
+PrintWriter out = response.getWriter();
+response.setContentType("text/html");
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+Connection con = DriverManager.getConnection(
+"jdbc:mysql://localhost:3306/studentdb", "root", "");
+PreparedStatement ps = con.prepareStatement("INSERT INTO students(name,
+email, course) VALUES (?, ?, ?)");
+ps.setString(1, name);
+ps.setString(2, email);
+ps.setString(3, course);
+ps.executeUpdate();
+out.println("<h3>Student Registered Successfully</h3>");
+con.close();
+} catch (Exception e) {
+out.println("Error: " + e.getMessage());
+}
+}
+}
+web.xml Configuration
+<web-app>
+<servlet>
+<servlet-name>RegisterServlet</servlet-name>
+<servlet-class>RegisterServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>RegisterServlet</servlet-name>
+<url-pattern>/RegisterServlet</url-pattern>
+</servlet-mapping>
+</web-app>
+SESSION 2: View & List Students
+Create ViewStudentsServlet.java
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.sql.*;
+public class ViewStudentsServlet extends HttpServlet {
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+response.setContentType("text/html");
+PrintWriter out = response.getWriter();
+out.println("<html><head><title>Student List</title></head><body>");
+out.println("<h2>Registered Students</h2>");
+out.println("<table border='1' cellpadding='10'>");
+out.println("<tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th></tr>");
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+Connection con = DriverManager.getConnection(
+"jdbc:mysql://localhost:3306/studentdb", "root", "");
+Statement stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery("SELECT * FROM students");
+while (rs.next()) {
+out.println("<tr>");
+out.println("<td>" + rs.getInt("id") + "</td>");
+out.println("<td>" + rs.getString("name") + "</td>");
+out.println("<td>" + rs.getString("email") + "</td>");
+out.println("<td>" + rs.getString("course") + "</td>");
+out.println("</tr>");
+}
+out.println("</table>");
+con.close();
+} catch (Exception e) {
+out.println("<p>Error: " + e.getMessage() + "</p>");
+}
+out.println("<br><a href='index.html'>Back to Registration</a>");
+out.println("</body></html>");
+}
+}
+Update web.xml to Map the New Servlet
+Add the following to web.xml:
+<servlet>
+<servlet-name>ViewStudentsServlet</servlet-name>
+<servlet-class>ViewStudentsServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>ViewStudentsServlet</servlet-name>
+<url-pattern>/ViewStudentsServlet</url-pattern>
+</servlet-mapping>
+Modify index.html to add a navigation link:
+<br>
+<a href="ViewStudentsServlet">View Registered Students</a>
+Session 3:
+ViewStudentsServlet.java
+Update the student listing table to add Edit and Delete buttons:
+out.println("<tr>");
+out.println("<td>" + rs.getInt("id") + "</td>");
+out.println("<td>" + rs.getString("name") + "</td>");
+out.println("<td>" + rs.getString("email") + "</td>");
+out.println("<td>" + rs.getString("course") + "</td>");
+out.println("<td><a href='EditStudentServlet?id=" + rs.getInt("id") + "'>Edit</a></td>");
+out.println("<td><a href='DeleteStudentServlet?id=" + rs.getInt("id") + "' onclick=\"return
+confirm('Are you sure?');\">Delete</a></td>");
+out.println("</tr>");
+Step 2: Create EditStudentServlet.java
+This servlet shows a form with pre-filled values:
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.sql.*;
+public class EditStudentServlet extends HttpServlet {
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+int id = Integer.parseInt(request.getParameter("id"));
+response.setContentType("text/html");
+PrintWriter out = response.getWriter();
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+Connection con =
+DriverManager.getConnection("jdbc:mysql://localhost:3306/studentdb", "root", "");
+PreparedStatement ps = con.prepareStatement("SELECT * FROM students WHERE
+id = ?");
+ps.setInt(1, id);
+ResultSet rs = ps.executeQuery();
+if (rs.next()) {
+out.println("<h2>Edit Student</h2>");
+out.println("<form action='UpdateStudentServlet' method='post'>");
+out.println("<input type='hidden' name='id' value='" + id + "'>");
+out.println("Name: <input type='text' name='name' value='" + rs.getString("name")
++ "'><br><br>");
+out.println("Email: <input type='text' name='email' value='" + rs.getString("email") +
+"'><br><br>");
+out.println("Course: <input type='text' name='course' value='" +
+rs.getString("course") + "'><br><br>");
+out.println("<input type='submit' value='Update'>");
+out.println("</form>");
+}
+con.close();
+} catch (Exception e) {
+out.println("Error: " + e.getMessage());
+}
+}
+}
+Create UpdateStudentServlet.java
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.sql.*;
+public class UpdateStudentServlet extends HttpServlet {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+int id = Integer.parseInt(request.getParameter("id"));
+String name = request.getParameter("name");
+String email = request.getParameter("email");
+String course = request.getParameter("course");
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+Connection con =
+DriverManager.getConnection("jdbc:mysql://localhost:3306/studentdb", "root", "");
+PreparedStatement ps = con.prepareStatement("UPDATE students SET name=?,
+email=?, course=? WHERE id=?");
+ps.setString(1, name);
+ps.setString(2, email);
+ps.setString(3, course);
+ps.setInt(4, id);
+ps.executeUpdate();
+con.close();
+response.sendRedirect("ViewStudentsServlet");
+} catch (Exception e) {
+response.getWriter().println("Error: " + e.getMessage());
+}
+}
+}
+Create DeleteStudentServlet.java
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.sql.*;
+public class DeleteStudentServlet extends HttpServlet {
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+int id = Integer.parseInt(request.getParameter("id"));
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+Connection con =
+DriverManager.getConnection("jdbc:mysql://localhost:3306/studentdb", "root", "");
+PreparedStatement ps = con.prepareStatement("DELETE FROM students WHERE
+id=?");
+ps.setInt(1, id);
+ps.executeUpdate();
+}
+con.close();
+response.sendRedirect("ViewStudentsServlet");
+} catch (Exception e) {
+response.getWriter().println("Error: " + e.getMessage());
+}
+Update web.xml
+Add mappings for the new servlets:
+<servlet>
+<servlet-name>EditStudentServlet</servlet-name>
+<servlet-class>EditStudentServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>EditStudentServlet</servlet-name>
+<url-pattern>/EditStudentServlet</url-pattern>
+</servlet-mapping>
+<servlet>
+<servlet-name>UpdateStudentServlet</servlet-name>
+<servlet-class>UpdateStudentServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>UpdateStudentServlet</servlet-name>
+<url-pattern>/UpdateStudentServlet</url-pattern>
+</servlet-mapping>
+<servlet>
+<servlet-name>DeleteStudentServlet</servlet-name>
+<servlet-class>DeleteStudentServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>DeleteStudentServlet</servlet-name>
+<url-pattern>/DeleteStudentServlet</url-pattern>
+</servlet-mapping>
+
+49. Implement the following web applications using (a) PHP, (b) Servlets and (c) JSP.
+i) A user validation web application, where the user submits the login name and password to the server. The name and password are checked against the data already available in Database and if the data matches, a successful login page is returned. Otherwise a failure message is shown to the user.
+ii) Modify the above program to use an XML file instead of database.
+iii) Modify the above program using AJAX to show the result on the same page below the submit button.
+iv) A simple calculator application that takes two numbers and an operator (+,-,*,/,%) from an HTML page and returns the result page with the operation performed on the operands.
+v) A web application takes a name as input and on submit it shows a hello<name>page where <name> is taken from the request. It shows the start time at the right top corner of the page and provides the logout button. On clicking this button, it should show a logout page with Thank You<name> message with the duration of usage.(Use session to store name and time).
+i)
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Login Page</title>
+</head>
+<body>
+ <h2>Login</h2>
+ <form method="POST" action="validate.php">
+<label for="username">Username:</label>
+ <input type="text" id="username" name="username" required><br><br>
+ <label for="password">Password:</label>
+ <input type="password" id="password" name="password" required><br><br>
+ <button type="submit">Login</button>
+ </form>
+</body>
+</html>
+Validate.php
+<?php
+$servername = "localhost";
+$dbUsername = "root";
+$dbPassword = "";
+$dbName = "wp_record";
+$conn = new mysqli($servername, $dbUsername, $dbPassword, $dbName);
+if ($conn->connect_error) {
+ die("Connection failed: " . $conn->connect_error);
+}
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+ $username = $_POST['username'];
+ $password = $_POST['password'];
+ $stmt = $conn->prepare("SELECT password FROM users WHERE username = ?");
+ $stmt->bind_param("s", $username);
+ $stmt->execute();
+ $result = $stmt->get_result();
+ if ($result->num_rows > 0) {
+ $user = $result->fetch_assoc();
+ if ($password === $user['password']) {
+ echo "Login Successful! Welcome, " .
+htmlspecialchars($username);
+ } else {
+ echo "Login Failed! Invalid password.";
+}
+ } else {
+ echo "Login Failed! User not found.";
+ }
+ $stmt->close();
+ $conn->close();
+}
+?>
+ii) XML
+<?xml version="1.0"?>
+<users>
+ <user>
+ <username>admin</username>
+<password>password123</password>
+ </user>
+ <user>
+ <username>user</username>
+<password>mypassword</password>
+ </user>
+</users>
+<?php
+$xml = simplexml_load_file("users.xml");
+$username = $_POST['username'];
+$password = $_POST['password'];
+$validLogin = false;
+foreach ($xml->user as $user) {
+ if ($user->username == $username && $user->password == $password) {
+ $validLogin = true;
+ break;
+ }
+}
+if ($validLogin) {
+ echo "Login Successful! Welcome, " . $username;
+} else {
+ echo "Login Failed! Invalid username or password.";
+}
+?>
+c) JSP
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Login Page</title>
+</head>
+<body>
+ <h2>Login</h2>
+ <form method="POST" action="login.jsp">
+ <label for="username">Username:</label>
+ <input type="text" id="username" name="username" required><br><br>
+ <label for="password">Password:</label>
+ <input type="password" id="password" name="password" required><br><br>
+ <button type="submit">Login</button>
+ </form>
+ <%
+ String username = request.getParameter("username");
+ String password = request.getParameter("password");
+ if ("admin".equals(username) && "password123".equals(password)) {
+ out.println("Login Successful! Welcome, " + username);
+ } else if (username != null && password != null) {
+ out.println("Login Failed! Invalid username or password.");
+}
+ %>
+</body>
+</html>
+iii) AJAX
+login.html
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Login</title>
+ <script>
+ function validateLogin() {
+ var username = document.getElementById("username").value;
+ var password = document.getElementById("password").value;
+ var xhr = new XMLHttpRequest();
+ xhr.open("POST", "validate.php", true);
+xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+ xhr.onreadystatechange = function() {
+ if (xhr.readyState == 4 && xhr.status == 200) {
+document.getElementById("result").innerHTML = xhr.responseText;
+ }
+ };
+ xhr.send("username=" + username + "&password=" + password);
+}
+ </script>
+</head>
+<body>
+ <h2>Login</h2>
+ <form onsubmit="event.preventDefault(); validateLogin();">
+ <label for="username">Username:</label>
+ <input type="text" id="username" name="username" required><br><br>
+ <label for="password">Password:</label>
+ <input type="password" id="password" name="password" required><br><br>
+ <button type="submit">Login</button>
+</form>
+ <div id="result"></div>
+</body>
+</html>
+iv)
+CALCULATOR
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Calculator</title>
+</head>
+<body>
+ <h2>Simple Calculator</h2>
+ <form method="POST" action="calculator.php">
+ <label for="num1">Number 1:</label>
+ <input type="number" name="num1" required><br><br>
+ <label for="num2">Number 2:</label>
+ <input type="number" name="num2" required><br><br>
+ <label for="operation">Operation:</label>
+ <select name="operation">
+<option value="+">+</option>
+ <option value="-">-</option>
+ <option value="*">*</option>
+ <option value="/">/</option>
+ <option value="%">%</option>
+ </select><br><br>
+ <button type="submit">Calculate</button>
+ </form>
+ <?php
+ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ $num1 = $_POST["num1"];
+ $num2 = $_POST["num2"];
+ $operation = $_POST["operation"];
+ switch ($operation) {
+ case "+":
+$result = $num1 + $num2;
+ break;
+ case "-":
+ $result = $num1 - $num2;
+ break;
+ case "*":
+ $result = $num1 * $num2;
+ break;
+ case "/":
+ if ($num2 != 0) {
+ $result = $num1 / $num2;
+ } else {
+ $result = "Error: Division by zero!";
+ }
+ break;
+ case "%":
+ $result = $num1 % $num2;
+ break;
+}
+ echo "Result: " . $result;
+ }
+ ?>
+</body>
+</html>
+v) SESSION
+Index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+text-align: center;
+margin-top: 20%;
+}
+input, button {
+padding: 10px;
+margin: 5px;
+}
+</style>
+</head>
+<body>
+<h1>Welcome</h1>
+<form action="welcome.php" method="POST">
+<label for="name">Enter your name:</label>
+<input type="text" id="name" name="name" required>
+<button type="submit">Submit</button>
+</form>
+</body>
+</html>
+Welcome.php
+<?php
+session_start();
+// Start session
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+$_SESSION['name'] = $_POST['name'];
+$_SESSION['start_time'] = time();
+// Store current time as start time
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hello Page</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+margin: 0;
+padding: 0;
+}
+.header {
+position: absolute;
+right: 20px;
+top: 10px;
+font-size: 14px;
+}
+.content {
+text-align: center;
+margin-top: 100px;
+}
+.logout-button {
+display: inline-block;
+margin-top: 20px;
+padding: 10px 20px;
+background-color: #4CAF50;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+}
+</style>
+</head>
+<body>
+<div class="content">
+<h2>Hello, <?php echo isset($_SESSION['name']) ?
+$_SESSION['name'] : 'Guest';
+?>!</h2>
+<a href="logout.php" class="logout-button">Logout</a>
+</div>
+<?php if (isset($_SESSION['start_time'])): ?>
+<div class="header">
+<p>Session started at: <span id="timer"></span></p>
+</div>
+<?php endif;
+?>
+<script>
+var sessionStartTime = <?php echo isset($_SESSION['start_time']) ?
+$_SESSION['start_time'] : 0; ?>;
+var currentTime = Math.floor(Date.now() / 1000);
+// Get current time in seconds
+var elapsedTime = currentTime - sessionStartTime;
+function formatTime(seconds) {
+var hours = Math.floor(seconds / 3600);
+var minutes = Math.floor((seconds % 3600) / 60);
+var remainingSeconds = seconds % 60;
+return hours + "h " + minutes + "m " + remainingSeconds + "s";
+}
+function updateTimer() {
+elapsedTime++;
+document.getElementById("timer").innerHTML = formatTime(elapsedTime);
+}
+setInterval(updateTimer, 1000);
+</script>
+</body>
+</html>
+Logout.php
+<?php
+session_start();
+if (!isset($_SESSION['name'])) {
+header("Location: index.html");
+exit();
+}
+$endTime = time();
+$duration = $endTime - $_SESSION['start_time'];
+$name = $_SESSION['name'];
+$hours = floor($duration / 3600);
+$minutes = floor(($duration % 3600) / 60);
+$seconds = $duration % 60;
+session_destroy();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logout</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+text-align: center;
+margin-top: 20%;
+}
+.thank-you {
+color: #333;
+}
+</style>
+</head>
+<body>
+<h1 class="thank-you">Thank You, <?php echo $name; ?>!</h1>
+<p>You used the application for <?php echo "$hours hours, $minutes minutes, and
+$seconds seconds.";
+?></p>
+<a href="index.html">Go Back to Login</a>
+</body>
+</html>
+
+50. Write a web application using Ajax to do the following: A. check to make sure that the credit card number is composed of exactly 16 numerical digits A check to make sure that a Visa card number starts with a "4" and a MasterCard number starts with a "5" You can check for these things using regular expressions in combination with the PHP function preg_match. A really good regex will allow for an optional ―-― between every grouping of 4 numbers. For example, 4111111111111111 and 4111-1111-1111-1111 would both be valid credit card numbers. If the user has not supplied a card number with the correct number of digits, show an error message.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credit Card Validation with AJAX</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+max-width: 600px;
+margin: 50px auto;
+padding: 20px;
+background-color: #f5f5f5;
+}
+.container {
+background-color: white;
+padding: 30px;
+border-radius: 10px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+h1 {
+text-align: center;
+color: #333;
+margin-bottom: 30px;
+}
+.form-group {
+margin-bottom: 20px;
+}
+label {
+display: block;
+margin-bottom: 8px;
+font-weight: bold;
+color: #555;
+}
+input[type="text"] {
+width: 100%;
+padding: 12px;
+border: 2px solid #ddd;
+border-radius: 5px;
+font-size: 16px;
+box-sizing: border-box;
+transition: border-color 0.3s;
+}
+input[type="text"]:focus {
+border-color: #4CAF50;
+outline: none;
+}
+button {
+background-color: #4CAF50;
+color: white;
+padding: 12px 30px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+width: 100%;
+transition: background-color 0.3s;
+}
+button:hover {
+background-color: #45a049;
+}
+button:disabled {
+background-color: #cccccc;
+cursor: not-allowed;
+}
+.result {
+margin-top: 20px;
+padding: 15px;
+border-radius: 5px;
+font-weight: bold;
+display: none;
+}
+.success {
+background-color: #d4edda;
+color: #155724;
+border: 1px solid #c3e6cb;
+}
+.error {
+background-color: #f8d7da;
+color: #721c24;
+border: 1px solid #f5c6cb;
+}
+.loading {
+background-color: #fff3cd;
+color: #856404;
+border: 1px solid #ffeaa7;
+}
+.card-info {
+background-color: #e3f2fd;
+padding: 15px;
+border-radius: 5px;
+margin-bottom: 20px;
+}
+.card-type {
+font-weight: bold;
+color: #1976d2;
+}
+.validation-details {
+margin-top: 10px;
+font-size: 14px;
+}
+.check-item {
+margin: 5px 0;
+padding: 5px;
+border-radius: 3px;
+}
+.check-pass {
+background-color: #d4edda;
+color: #155724;
+}
+.check-fail {
+background-color: #f8d7da;
+color: #721c24;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Credit Card Validation System</h1>
+<div class="card-info">
+<h3>Supported Card Types:</h3>
+<p><strong>Visa:</strong> Starts with 4 (16 digits)</p>
+<p><strong>MasterCard:</strong> Starts with 5 (16 digits)</p>
+<p><strong>Format:</strong> You can use dashes between groups of 4 digits
+(optional)</p>
+<p><strong>Example:</strong> 4111-1111-1111-1111 or 4111111111111111</p>
+</div>
+<form id="creditCardForm">
+<div class="form-group">
+<label for="cardNumber">Credit Card Number:</label>
+<input type="text"
+id="cardNumber"
+name="cardNumber"
+placeholder="Enter 16-digit card number (with or without dashes)"
+maxlength="19">
+</div>
+<button type="submit" id="validateBtn">Validate Card Number</button>
+</form>
+<div id="result" class="result"></div>
+</div>
+<script>
+document.getElementById('creditCardForm').addEventListener('submit', function(e) {
+e.preventDefault();
+validateCreditCard();
+});
+document.getElementById('cardNumber').addEventListener('input', function(e) {
+let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+let formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-'); // Add dashes
+if (formattedValue.length <= 19) { // Max length with dashes
+e.target.value = formattedValue;
+}
+});
+function validateCreditCard() {
+const cardNumber = document.getElementById('cardNumber').value;
+const resultDiv = document.getElementById('result');
+const validateBtn = document.getElementById('validateBtn');
+resultDiv.style.display = 'block';
+resultDiv.className = 'result loading';
+resultDiv.innerHTML = 'Validating card number...';
+validateBtn.disabled = true;
+setTimeout(() => {
+// Create FormData to send to PHP (simulated)
+const formData = new FormData();
+formData.append('cardNumber', cardNumber);
+// Simulate AJAX request
+performValidation(cardNumber);
+validateBtn.disabled = false;
+}, 1000);
+// Simulate network delay
+function performValidation(cardNumber) {
+const resultDiv = document.getElementById('result');
+const cleanNumber = cardNumber.replace(/\D/g, '');
+let isValid = true;
+let cardType = '';
+let validationDetails = [];
+if (cleanNumber.length === 16) {
+validationDetails.push({
+check: 'Length Check',
+result: 'PASS',
+message: 'Card number has exactly 16 digits'
+});
+} else {
+validationDetails.push({
+check: 'Length Check',
+result: 'FAIL',
+message: `Card number has ${cleanNumber.length} digits, but 16 required`
+});
+isValid = false;
+}
+if (/^\d+$/.test(cleanNumber)) {
+validationDetails.push({
+check: 'Digit Check',
+result: 'PASS',
+message: 'All characters are numeric'
+});
+} else {
+validationDetails.push({
+check: 'Digit Check',
+result: 'FAIL',
+message: 'Card number contains non-numeric characters'
+});
+isValid = false;
+}
+if (cleanNumber.charAt(0) === '4') {
+cardType = 'Visa';
+validationDetails.push({
+check: 'Card Type',
+result: 'PASS',
+message: 'Valid Visa card (starts with 4)'
+});
+} else if (cleanNumber.charAt(0) === '5') {
+cardType = 'MasterCard';
+validationDetails.push({
+check: 'Card Type',
+result: 'PASS',
+message: 'Valid MasterCard (starts with 5)'
+});
+} else {
+validationDetails.push({
+check: 'Card Type',
+result: 'FAIL',
+message: 'Invalid card type. Must start with 4 (Visa) or 5 (MasterCard)'
+});
+isValid = false;
+}
+const formatRegex = /^(\d{4}-?\d{4}-?\d{4}-?\d{4})$/;
+if (formatRegex.test(cardNumber)) {
+validationDetails.push({
+check: 'Format Check',
+result: 'PASS',
+message: 'Card number format is valid'
+});
+} else {
+validationDetails.push({
+check: 'Format Check',
+result: 'FAIL',
+message: 'Invalid format. Use XXXX-XXXX-XXXX-XXXX or
+XXXXXXXXXXXXXXXX'
+});
+isValid = false;
+}
+let luhnValid = luhnCheck(cleanNumber);
+if (luhnValid) {
+validationDetails.push({
+check: 'Luhn Algorithm',
+result: 'PASS',
+message: 'Card number passes Luhn checksum validation'
+});
+} else {
+validationDetails.push({
+check: 'Luhn Algorithm',
+result: 'FAIL',
+message: 'Card number fails Luhn checksum validation'
+});
+isValid = false;
+}
+displayValidationResult(isValid, cardType, cleanNumber, validationDetails);
+}
+function luhnCheck(cardNumber) {
+// Luhn Algorithm implementation
+let sum = 0;
+let alternate = false;
+for (let i = cardNumber.length - 1; i >= 0; i--) {
+let digit = parseInt(cardNumber.charAt(i));
+if (alternate) {
+digit *= 2;
+if (digit > 9) {
+digit = (digit % 10) + 1;
+}
+}
+sum += digit;
+alternate = !alternate;
+}
+return (sum % 10) === 0;
+}
+function displayValidationResult(isValid, cardType, cleanNumber, validationDetails) {
+const resultDiv = document.getElementById('result');
+let resultHTML = '';
+if (isValid) {
+resultDiv.className = 'result success';
+resultHTML = `
+<h3>Valid Credit Card!</h3>
+<p><span class="card-type">Card Type:</span> ${cardType}</p>
+<p><span class="card-type">Card Number:</span>
+${formatCardNumber(cleanNumber)}</p>
+<p><span class="card-type">Status:</span> This card number is valid and
+ready for processing.</p>
+`;
+} else {
+resultDiv.className = 'result error';
+resultHTML = `
+<h3> Invalid Credit Card</h3>
+<p>The credit card number you entered is not valid.</p>
+`;
+}
+resultHTML += '<div class="validation-details"><h4>Validation Details:</h4>';
+validationDetails.forEach(detail => {
+const checkClass = detail.result === 'PASS' ? 'check-pass' : 'check-fail';
+resultHTML += `
+<div class="check-item ${checkClass}">
+<strong>${detail.check}:</strong> ${detail.result} - ${detail.message}
+</div>
+`;
+});
+resultHTML += '</div>';
+resultDiv.innerHTML = resultHTML;
+}
+function formatCardNumber(cardNumber) {
+return cardNumber.replace(/(\d{4})(?=\d)/g, '$1-');
+}
+function fillSampleCard(type) {
+const cardInput = document.getElementById('cardNumber');
+if (type === 'visa') {
+cardInput.value = '4111-1111-1111-1111'; // Valid Visa test number
+} else if (type === 'mastercard') {
+cardInput.value = '5555-5555-5555-4444';
+// Valid MasterCard test number
+}
+}
+window.addEventListener('load', function() {
+const container = document.querySelector('.container');
+const sampleDiv = document.createElement('div');
+sampleDiv.innerHTML = `
+<div style="margin-top: 20px; text-align: center;">
+<p><strong>Test with sample cards:</strong></p>
+<button type="button" onclick="fillSampleCard('visa')" style="margin: 5px; width:
+auto; background-color: #2196F3;">Test Visa</button>
+<button type="button" onclick="fillSampleCard('mastercard')" style="margin:
+5px; width: auto; background-color: #FF9800;">Test MasterCard</button>
+</div>
+`;
+container.appendChild(sampleDiv);
+});
+</script>
+</body>
+</html>
